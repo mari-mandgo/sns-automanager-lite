@@ -850,7 +850,10 @@
           })
         });
         const data = await response.json();
-        if (!response.ok || !data.ok) throw new Error(data.error || "X投稿に失敗しました");
+        if (!response.ok || !data.ok) {
+          const detail = data.detail ? JSON.stringify(data.detail).slice(0, 500) : "";
+          throw new Error(`${data.error || "X投稿に失敗しました"} ${detail}`.trim());
+        }
         item.status = "posted";
         item.metrics = item.metrics || {};
         item.metrics.url = data.url || "";
@@ -861,7 +864,12 @@
         showToast("Xに投稿しました");
       } catch (error) {
         console.error(error);
-        showToast(error.message || "X投稿に失敗しました");
+        item.metrics = item.metrics || {};
+        item.metrics.memo = `X投稿失敗: ${error.message || "unknown_error"}`;
+        saveState();
+        render();
+        alert(`X投稿に失敗しました。\n\n${error.message || "原因不明のエラーです"}`);
+        showToast("X投稿に失敗しました");
       }
     }
 
