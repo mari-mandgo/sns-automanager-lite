@@ -665,8 +665,8 @@
             </div>
             <div class="card-tools">
               <button class="btn small" data-action="copyAll">3枚コピー</button>
-              <button class="btn small" data-action="openXDraft">X下書き</button>
-              <button class="btn small" data-action="openThreadsDraft">Threads下書き</button>
+              <button class="btn small" data-action="openXDraft">X投稿画面</button>
+              <button class="btn small" data-action="openThreadsDraft">Threadsコピー</button>
               <button class="btn small" data-action="toggleStatus">${item.status === "posted" ? "未投稿へ" : "投稿済み"}</button>
               <button class="btn small danger" data-action="delete">削除</button>
             </div>
@@ -798,104 +798,12 @@
         showToast("本文がありません");
         return;
       }
-      const draftWindow = window.open("about:blank", "_blank");
-      await copyText(text);
       if (target === "x") {
-        draftWindow.location.href = `https://x.com/intent/tweet?text=${encodeURIComponent(text)}`;
-        showToast("X下書きを開きました");
+        window.location.href = `https://x.com/intent/tweet?text=${encodeURIComponent(text)}`;
         return;
       }
-      draftWindow.location.href = "https://www.threads.com/";
-      showToast("本文をコピーしてThreadsを開きました");
-    }
-
-    function normalizeSheetItem(item) {
-      const slides = item.slides || [item.slide1 || "", item.slide2 || "", item.slide3 || ""];
-      return {
-        id: item.id || crypto.randomUUID(),
-        date: item.date || new Date().toISOString().slice(0, 10),
-        account: item.account || "まり小学校受験",
-        platform: item.platform || "Threads / X",
-        timeSlot: item.timeSlot || "未定",
-        theme: item.theme || slides[0] || "投稿",
-        status: item.status || "draft",
-        slides: [slides[0] || "", slides[1] || "", slides[2] || ""],
-        metrics: {
-          url: item.postUrl || item.metrics?.url || "",
-          views: item.views || item.metrics?.views || "",
-          likes: item.likes || item.metrics?.likes || "",
-          replies: item.replies || item.metrics?.replies || "",
-          reposts: item.reposts || item.metrics?.reposts || "",
-          saves: item.saves || item.metrics?.saves || "",
-          followersDelta: item.followersDelta || item.metrics?.followersDelta || "",
-          memo: item.memo || item.metrics?.memo || ""
-        },
-        createdAt: item.createdAt || new Date().toISOString(),
-        updatedAt: item.updatedAt || new Date().toISOString()
-      };
-    }
-
-    function toSheetPayload(item) {
-      return {
-        id: item.id,
-        date: item.date || new Date().toISOString().slice(0, 10),
-        account: item.account || "",
-        platform: item.platform || "",
-        timeSlot: item.timeSlot || "",
-        theme: item.theme || "",
-        status: item.status || "draft",
-        slide1: item.slides?.[0] || "",
-        slide2: item.slides?.[1] || "",
-        slide3: item.slides?.[2] || "",
-        postUrl: item.metrics?.url || "",
-        views: item.metrics?.views || "",
-        likes: item.metrics?.likes || "",
-        replies: item.metrics?.replies || "",
-        reposts: item.metrics?.reposts || "",
-        saves: item.metrics?.saves || "",
-        followersDelta: item.metrics?.followersDelta || "",
-        memo: item.metrics?.memo || "",
-        createdAt: item.createdAt || new Date().toISOString(),
-        updatedAt: new Date().toISOString()
-      };
-    }
-
-    async function loadFromSheets() {
-      try {
-        showToast("Sheetsから読み込み中...");
-        const url = `${SHEET_API_URL}?action=list&key=${encodeURIComponent(SHEET_API_KEY)}`;
-        const response = await fetch(url);
-        const data = await response.json();
-        if (!data.ok) throw new Error(data.error || "load_failed");
-        state.items = (data.items || []).map(normalizeSheetItem);
-        saveState();
-        render();
-        showToast(`${state.items.length}件読み込みました`);
-      } catch (error) {
-        console.error(error);
-        showToast("Sheets読込に失敗しました");
-      }
-    }
-
-    async function saveToSheets() {
-      try {
-        showToast("Sheetsへ保存中...");
-        const response = await fetch(SHEET_API_URL, {
-          method: "POST",
-          headers: { "Content-Type": "text/plain;charset=utf-8" },
-          body: JSON.stringify({
-            key: SHEET_API_KEY,
-            action: "bulkUpsert",
-            items: state.items.map(toSheetPayload)
-          })
-        });
-        const data = await response.json();
-        if (!data.ok) throw new Error(data.error || "save_failed");
-        showToast(`${state.items.length}件保存しました`);
-      } catch (error) {
-        console.error(error);
-        showToast("Sheets保存に失敗しました");
-      }
+      await copyText(text);
+      window.location.href = "https://www.threads.com/";
     }
 
     function exportCsv() {
@@ -1042,6 +950,8 @@
   </script>
 </body>
 </html>
+
+
 
 
 
