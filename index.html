@@ -374,6 +374,7 @@
           <button class="btn" id="openAdd">投稿を追加</button>
           <button class="btn" id="loadSheets">Sheets読込</button>
           <button class="btn" id="saveSheets">Sheets保存</button>
+          <button class="btn" id="resetPostSecret">投稿キー再設定</button>
           <button class="btn" id="exportCsv">ログCSV</button>
           <button class="btn danger" id="resetData">初期化</button>
         </div>
@@ -858,7 +859,8 @@
         const data = await response.json();
         if (!response.ok || !data.ok) {
           const detail = data.detail ? JSON.stringify(data.detail).slice(0, 500) : "";
-          throw new Error(`${data.error || "X投稿に失敗しました"} ${detail}`.trim());
+          const statusHint = response.status ? `HTTP ${response.status}` : "";
+          throw new Error(`${statusHint} ${data.error || "X投稿に失敗しました"} ${detail}`.trim());
         }
         item.status = "posted";
         item.metrics = item.metrics || {};
@@ -870,6 +872,9 @@
         showToast("Xに投稿しました");
       } catch (error) {
         console.error(error);
+        if (/401|unauthorized/i.test(error.message || "")) {
+          localStorage.removeItem("snsAutoManagerLite.postSecret");
+        }
         item.metrics = item.metrics || {};
         item.metrics.memo = `X投稿失敗: ${error.message || "unknown_error"}`;
         saveState();
@@ -1016,6 +1021,10 @@
     document.getElementById("exportCsv").addEventListener("click", exportCsv);
     document.getElementById("loadSheets").addEventListener("click", loadFromSheets);
     document.getElementById("saveSheets").addEventListener("click", saveToSheets);
+    document.getElementById("resetPostSecret").addEventListener("click", () => {
+      localStorage.removeItem("snsAutoManagerLite.postSecret");
+      showToast("投稿キーをリセットしました");
+    });
 
     document.getElementById("importMd").addEventListener("click", () => {
       const imported = parseMd(els.mdInput.value);
