@@ -834,6 +834,106 @@
       URL.revokeObjectURL(link.href);
     }
 
+    function sheetRowToItem(row) {
+      return {
+        id: row.id || crypto.randomUUID(),
+        date: row.date || new Date().toISOString().slice(0, 10),
+        account: row.account || "まり小学校受験",
+        platform: row.platform || "Threads/X",
+        timeSlot: row.timeSlot || "未定",
+        theme: row.theme || row.slide1 || "投稿",
+        status: row.status || "draft",
+        slides: [row.slide1 || "", row.slide2 || "", row.slide3 || ""],
+        metrics: {
+          url: row.postUrl || "",
+          views: row.views || "",
+          likes: row.likes || "",
+          replies: row.replies || "",
+          reposts: row.reposts || "",
+          saves: row.saves || "",
+          followersDelta: row.followersDelta || "",
+          memo: row.memo || ""
+        },
+        createdAt: row.createdAt || "",
+        updatedAt: row.updatedAt || ""
+      };
+    }
+
+    function itemToSheetRow(item) {
+      return {
+        id: item.id || crypto.randomUUID(),
+        date: item.date || "",
+        account: item.account || "",
+        platform: item.platform || "",
+        timeSlot: item.timeSlot || "",
+        theme: item.theme || "",
+        status: item.status || "",
+        slide1: item.slides?.[0] || "",
+        slide2: item.slides?.[1] || "",
+        slide3: item.slides?.[2] || "",
+        postUrl: item.metrics?.url || "",
+        views: item.metrics?.views || "",
+        likes: item.metrics?.likes || "",
+        replies: item.metrics?.replies || "",
+        reposts: item.metrics?.reposts || "",
+        saves: item.metrics?.saves || "",
+        followersDelta: item.metrics?.followersDelta || "",
+        memo: item.metrics?.memo || "",
+        createdAt: item.createdAt || new Date().toISOString(),
+        updatedAt: new Date().toISOString()
+      };
+    }
+
+    async function loadFromSheets() {
+      if (!SHEET_API_URL) {
+        showToast("Sheets URLが未設定です");
+        return;
+      }
+      try {
+        showToast("Sheets読込中...");
+        const url = `${SHEET_API_URL}?key=${encodeURIComponent(SHEET_API_KEY)}`;
+        const response = await fetch(url);
+        const data = await response.json();
+        if (!data.ok) throw new Error(data.error || "Sheets読込に失敗しました");
+        state.items = (data.items || []).map(sheetRowToItem);
+        saveState();
+        render();
+        showToast(`${state.items.length}件読み込みました`);
+      } catch (error) {
+        console.error(error);
+        showToast("Sheets読込に失敗しました");
+      }
+    }
+
+    async function saveToSheets() {
+      if (!SHEET_API_URL) {
+        showToast("Sheets URLが未設定です");
+        return;
+      }
+      try {
+        showToast("Sheets保存中...");
+        const payload = {
+          key: SHEET_API_KEY,
+          action: "bulkUpsert",
+          items: state.items.map(itemToSheetRow)
+        };
+        const response = await fetch(SHEET_API_URL, {
+          method: "POST",
+          headers: { "Content-Type": "text/plain;charset=utf-8" },
+          body: JSON.stringify(payload)
+        });
+        const data = await response.json();
+        if (!data.ok) throw new Error(data.error || "Sheets保存に失敗しました");
+        state.items = (data.items || []).map(sheetRowToItem);
+        saveState();
+        render();
+        showToast(`${state.items.length}件保存しました`);
+      } catch (error) {
+        console.error(error);
+        showToast("Sheets保存に失敗しました");
+      }
+    }
+
     document.querySelectorAll("[data-close]").forEach(button => {
       button.addEventListener("click", () => document.getElementById(button.dataset.close).close());
     });
