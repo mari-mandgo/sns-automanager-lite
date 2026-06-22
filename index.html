@@ -273,7 +273,13 @@
     }
 
     .slide-title { font-size: 12px; color: var(--muted); font-weight: 700; }
-    .slide p { margin: 0; line-height: 1.62; white-space: pre-wrap; overflow-wrap: anywhere; }
+    .slide textarea {
+      min-height: 190px;
+      line-height: 1.62;
+      white-space: pre-wrap;
+      overflow-wrap: anywhere;
+      background: #fff;
+    }
 
     .log-area {
       border-top: 1px solid #eef1f6;
@@ -678,7 +684,7 @@
                   <span class="slide-title">${index + 1}枚目</span>
                   <button class="btn small" data-action="copySlide" data-slide="${index}">コピー</button>
                 </div>
-                <p>${escapeHtml(slide)}</p>
+                <textarea data-slide-field="${index}" aria-label="${index + 1}枚目">${escapeHtml(slide)}</textarea>
               </section>
             `).join("")}
           </div>
@@ -824,8 +830,8 @@
         showToast("今は教育AIだけX投稿できます");
         return;
       }
-      const text = buildPostText(item);
-      if (!text) {
+      const slides = (item.slides || []).map(slide => String(slide || "").trim()).filter(Boolean);
+      if (!slides.length) {
         showToast("本文がありません");
         return;
       }
@@ -834,7 +840,7 @@
         showToast("投稿キーが必要です");
         return;
       }
-      if (!confirm("この内容を教育AIアカウントでXに投稿しますか？")) return;
+      if (!confirm(`この内容を教育AIアカウントでXに${slides.length}投稿のスレッドとして投稿しますか？`)) return;
       try {
         showToast("X投稿中...");
         const response = await fetch("/api/x/post", {
@@ -846,7 +852,7 @@
           body: JSON.stringify({
             id: item.id,
             account: item.account,
-            text
+            slides
           })
         });
         const data = await response.json();
@@ -857,7 +863,7 @@
         item.status = "posted";
         item.metrics = item.metrics || {};
         item.metrics.url = data.url || "";
-        item.metrics.memo = item.metrics.memo || "X API投稿済み";
+        item.metrics.memo = item.metrics.memo || `X API投稿済み（${data.ids?.length || slides.length}投稿スレッド）`;
         saveState();
         render();
         await saveToSheets();
@@ -1109,6 +1115,19 @@
       item.metrics[input.dataset.field] = input.value;
       saveState();
       renderStats();
+    });
+
+    els.queue.addEventListener("input", event => {
+      const input = event.target.closest("[data-slide-field]");
+      if (!input) return;
+      const card = event.target.closest(".card");
+      const item = findItem(card);
+      if (!item) return;
+      const index = Number(input.dataset.slideField);
+      item.slides = item.slides || ["", "", ""];
+      item.slides[index] = input.value;
+      if (index === 0 && !item.theme) item.theme = input.value.slice(0, 40);
+      saveState();
     });
 
     document.getElementById("copyToday").addEventListener("click", () => {
