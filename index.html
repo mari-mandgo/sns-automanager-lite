@@ -665,7 +665,7 @@
             </div>
             <div class="card-tools">
               <button class="btn small" data-action="copyAll">3枚コピー</button>
-              <button class="btn small" data-action="openXDraft">X投稿画面</button>
+              <button class="btn small" data-action="postX">X投稿</button>
               <button class="btn small" data-action="openThreadsDraft">Threadsコピー</button>
               <button class="btn small" data-action="toggleStatus">${item.status === "posted" ? "未投稿へ" : "投稿済み"}</button>
               <button class="btn small danger" data-action="delete">削除</button>
@@ -804,6 +804,65 @@
       }
       await copyText(text);
       window.location.href = "https://www.threads.com/";
+    }
+
+    function getPostSecret() {
+      let secret = localStorage.getItem("snsAutoManagerLite.postSecret") || "";
+      if (!secret) {
+        secret = prompt("X投稿用の投稿キーを入力してください。Vercelの SNS_POST_SECRET と同じ値です。") || "";
+        if (secret) localStorage.setItem("snsAutoManagerLite.postSecret", secret);
+      }
+      return secret;
+    }
+
+    async function postToX(item) {
+      if (location.protocol === "file:") {
+        showToast("X投稿はVercel版で使えます");
+        return;
+      }
+      if (item.account !== "まり教育AI") {
+        showToast("今は教育AIだけX投稿できます");
+        return;
+      }
+      const text = buildPostText(item);
+      if (!text) {
+        showToast("本文がありません");
+        return;
+      }
+      const secret = getPostSecret();
+      if (!secret) {
+        showToast("投稿キーが必要です");
+        return;
+      }
+      if (!confirm("この内容を教育AIアカウントでXに投稿しますか？")) return;
+      try {
+        showToast("X投稿中...");
+        const response = await fetch("/api/x/post", {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+            "X-Post-Secret": secret
+          },
+          body: JSON.stringify({
+            id: item.id,
+            account: item.account,
+            text
+          })
+        });
+        const data = await response.json();
+        if (!response.ok || !data.ok) throw new Error(data.error || "X投稿に失敗しました");
+        item.status = "posted";
+        item.metrics = item.metrics || {};
+        item.metrics.url = data.url || "";
+        item.metrics.memo = item.metrics.memo || "X API投稿済み";
+        saveState();
+        render();
+        await saveToSheets();
+        showToast("Xに投稿しました");
+      } catch (error) {
+        console.error(error);
+        showToast(error.message || "X投稿に失敗しました");
+      }
     }
 
     function exportCsv() {
@@ -1012,6 +1071,12 @@
       }
       if (action === "copyAll") {
         copyText((item.slides || []).join("\n\n"));
+      }
+      if (action === "postX") {
+        postToX(item);
+      }
+      if (action === "openThreadsDraft") {
+        openDraft(item, "threads");
       }
       if (action === "toggleStatus") {
         item.status = item.status === "posted" ? "draft" : "posted";
