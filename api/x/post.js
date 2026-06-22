@@ -1,7 +1,7 @@
 const crypto = require("node:crypto");
 
 const X_CREATE_POST_URL = "https://api.x.com/2/tweets";
-const ALLOWED_ACCOUNT = "まり教育AI";
+const ALLOWED_ACCOUNT = "\u307e\u308a\u6559\u80b2AI";
 
 function requiredEnv(name) {
   const value = process.env[name];
@@ -55,6 +55,33 @@ function buildOAuthHeader({ method, url }) {
     .join(", ");
 }
 
+async function createPost(payload) {
+  const response = await fetch(X_CREATE_POST_URL, {
+    method: "POST",
+    headers: {
+      "Authorization": buildOAuthHeader({
+        method: "POST",
+        url: X_CREATE_POST_URL
+      }),
+      "Content-Type": "application/json"
+    },
+    body: JSON.stringify(payload)
+  });
+  const data = await response.json().catch(() => ({}));
+
+  if (!response.ok) {
+    const error = new Error("x_api_error");
+    error.status = response.status;
+    error.detail = data;
+    throw error;
+  }
+
+  return {
+    id: data?.data?.id || "",
+    raw: data
+  };
+}
+
 module.exports = async function handler(req, res) {
   if (req.method !== "POST") {
     res.setHeader("Allow", "POST");
@@ -67,46 +94,51 @@ module.exports = async function handler(req, res) {
       return res.status(401).json({ ok: false, error: "unauthorized" });
     }
 
-    const { account, text } = req.body || {};
+    const body = typeof req.body === "string" ? JSON.parse(req.body || "{}") : (req.body || {});
+    const { account, text, slides } = body;
     if (account !== ALLOWED_ACCOUNT) {
       return res.status(403).json({ ok: false, error: "account_not_allowed" });
     }
-    if (!text || typeof text !== "string") {
+
+    const postTexts = Array.isArray(slides)
+      ? slides.map(slide => String(slide || "").trim()).filter(Boolean)
+      : [String(text || "").trim()].filter(Boolean);
+
+    if (!postTexts.length) {
       return res.status(400).json({ ok: false, error: "missing_text" });
     }
-    if (text.length > 25000) {
+    if (postTexts.join("").length > 25000) {
       return res.status(400).json({ ok: false, error: "text_too_long" });
     }
 
-    const response = await fetch(X_CREATE_POST_URL, {
-      method: "POST",
-      headers: {
-        "Authorization": buildOAuthHeader({
-          method: "POST",
-          url: X_CREATE_POST_URL
-        }),
-        "Content-Type": "application/json"
-      },
-      body: JSON.stringify({ text })
-    });
-    const data = await response.json().catch(() => ({}));
-
-    if (!response.ok) {
-      return res.status(response.status).json({
-        ok: false,
-        error: "x_api_error",
-        detail: data
-      });
+    const posts = [];
+    for (const postText of postTexts) {
+      const previous = posts[posts.length - 1];
+      const payload = previous
+        ? { text: postText, reply: { in_reply_to_tweet_id: previous.id } }
+        : { text: postText };
+      const created = await createPost(payload);
+      posts.push(created);
     }
 
-    const tweetId = data?.data?.id || "";
+    const firstId = posts[0]?.id || "";
+    const ids = posts.map(post => post.id).filter(Boolean);
     return res.status(200).json({
       ok: true,
-      id: tweetId,
-      url: tweetId ? `https://x.com/i/web/status/${tweetId}` : ""
+      id: firstId,
+      ids,
+      url: firstId ? `https://x.com/i/web/status/${firstId}` : "",
+      urls: ids.map(id => `https://x.com/i/web/status/${id}`)
     });
   } catch (error) {
     console.error(error);
+    if (error.message === "x_api_error") {
+      return res.status(error.status || 500).json({
+        ok: false,
+        error: "x_api_error",
+        detail: error.detail || {}
+      });
+    }
     return res.status(500).json({
       ok: false,
       error: error.message || "server_error"

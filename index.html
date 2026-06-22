@@ -822,7 +822,7 @@
       return secret;
     }
 
-    async function postToX(item) {
+    async function postToX(item, card) {
       if (location.protocol === "file:") {
         showToast("X投稿はVercel版で使えます");
         return;
@@ -831,11 +831,17 @@
         showToast("今は教育AIだけX投稿できます");
         return;
       }
-      const slides = (item.slides || []).map(slide => String(slide || "").trim()).filter(Boolean);
+      const visibleSlides = card
+        ? Array.from(card.querySelectorAll("[data-slide-field]")).map(input => input.value)
+        : [];
+      const sourceSlides = visibleSlides.length ? visibleSlides : (item.slides || []);
+      const slides = sourceSlides.map(slide => String(slide || "").trim()).filter(Boolean);
       if (!slides.length) {
         showToast("本文がありません");
         return;
       }
+      item.slides = sourceSlides.slice(0, 3);
+      saveState();
       const secret = getPostSecret();
       if (!secret) {
         showToast("投稿キーが必要です");
@@ -853,7 +859,8 @@
           body: JSON.stringify({
             id: item.id,
             account: item.account,
-            slides
+            slides,
+            text: slides.join("\n\n")
           })
         });
         const data = await response.json();
@@ -1096,7 +1103,7 @@
         copyText((item.slides || []).join("\n\n"));
       }
       if (action === "postX") {
-        postToX(item);
+        postToX(item, card);
       }
       if (action === "openThreadsDraft") {
         openDraft(item, "threads");
