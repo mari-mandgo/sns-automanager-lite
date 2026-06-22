@@ -1,9 +1,5 @@
 ﻿{
   "name": "sns-automanager-lite",
   "version": "0.1.0",
-  "private": true,
-  "scripts": {
-    "dev": "vercel dev",
-    "start": "vercel dev"
-  }
+  "private": true
 }
