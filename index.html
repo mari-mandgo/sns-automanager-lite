@@ -1,0 +1,1048 @@
+﻿<!doctype html>
+<html lang="ja">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>SNS AutoManager Lite</title>
+  <style>
+    :root {
+      color-scheme: light;
+      --ink: #202124;
+      --muted: #667085;
+      --line: #d9dee8;
+      --paper: #fffdf8;
+      --soft: #f4f7fb;
+      --accent: #1f7a6b;
+      --accent-2: #d94f70;
+      --warn: #a15c00;
+      --ok: #18794e;
+      --white: #fff;
+      --shadow: 0 16px 40px rgba(24, 39, 75, .10);
+    }
+
+    * { box-sizing: border-box; }
+
+    body {
+      margin: 0;
+      font-family: "Yu Gothic", "Hiragino Kaku Gothic ProN", Meiryo, system-ui, sans-serif;
+      color: var(--ink);
+      background: linear-gradient(135deg, #fffaf2 0%, #eef7f5 45%, #f7f8fc 100%);
+      letter-spacing: 0;
+    }
+
+    button, input, textarea, select { font: inherit; }
+
+    .shell { min-height: 100vh; }
+
+    header {
+      border-bottom: 1px solid rgba(31, 122, 107, .16);
+      background: rgba(255, 253, 248, .86);
+      backdrop-filter: blur(10px);
+      position: sticky;
+      top: 0;
+      z-index: 5;
+    }
+
+    .topbar {
+      width: min(1240px, calc(100% - 28px));
+      margin: 0 auto;
+      min-height: 70px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 14px;
+    }
+
+    h1 {
+      margin: 0;
+      font-size: 22px;
+      line-height: 1.2;
+    }
+
+    .subtitle {
+      color: var(--muted);
+      font-size: 13px;
+      margin-top: 4px;
+    }
+
+    .actions {
+      display: flex;
+      gap: 8px;
+      flex-wrap: wrap;
+      justify-content: flex-end;
+    }
+
+    .btn {
+      border: 1px solid var(--line);
+      background: var(--white);
+      color: var(--ink);
+      border-radius: 8px;
+      min-height: 38px;
+      padding: 8px 12px;
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      gap: 7px;
+      box-shadow: 0 1px 0 rgba(0,0,0,.02);
+    }
+
+    .btn:hover { border-color: #aeb8c9; }
+    .btn.primary { background: var(--accent); color: #fff; border-color: var(--accent); }
+    .btn.danger { color: #9b1c3d; border-color: #f0b9c6; background: #fff7fa; }
+    .btn.small { min-height: 32px; padding: 6px 9px; font-size: 13px; }
+
+    main {
+      width: min(1240px, calc(100% - 28px));
+      margin: 18px auto 40px;
+      display: grid;
+      grid-template-columns: 310px 1fr;
+      gap: 16px;
+    }
+
+    aside, .workspace {
+      background: rgba(255, 255, 255, .78);
+      border: 1px solid rgba(217, 222, 232, .84);
+      border-radius: 8px;
+      box-shadow: var(--shadow);
+    }
+
+    aside {
+      padding: 14px;
+      height: fit-content;
+      position: sticky;
+      top: 88px;
+    }
+
+    .workspace { padding: 14px; min-width: 0; }
+
+    .panel-title {
+      font-weight: 700;
+      font-size: 14px;
+      margin: 0 0 10px;
+    }
+
+    .field { margin-bottom: 11px; }
+    .field label { display: block; font-size: 12px; color: var(--muted); margin-bottom: 5px; }
+
+    input, select, textarea {
+      width: 100%;
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      background: #fff;
+      color: var(--ink);
+      padding: 9px 10px;
+      outline: none;
+    }
+
+    textarea { min-height: 130px; resize: vertical; line-height: 1.65; }
+    input:focus, select:focus, textarea:focus { border-color: var(--accent); box-shadow: 0 0 0 3px rgba(31, 122, 107, .12); }
+
+    .filters {
+      display: grid;
+      grid-template-columns: 1fr;
+      gap: 8px;
+      margin-bottom: 14px;
+    }
+
+    .stats {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 8px;
+      margin: 12px 0;
+    }
+
+    .stat {
+      background: var(--soft);
+      border: 1px solid #e7ecf4;
+      border-radius: 8px;
+      padding: 9px;
+    }
+
+    .stat b { display: block; font-size: 20px; line-height: 1.1; }
+    .stat span { color: var(--muted); font-size: 12px; }
+
+    .toolbar {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+      margin-bottom: 12px;
+      flex-wrap: wrap;
+    }
+
+    .tabs {
+      display: inline-flex;
+      border: 1px solid var(--line);
+      background: #fff;
+      border-radius: 8px;
+      overflow: hidden;
+    }
+
+    .tab {
+      border: 0;
+      border-right: 1px solid var(--line);
+      background: transparent;
+      padding: 8px 12px;
+      cursor: pointer;
+      min-width: 78px;
+    }
+
+    .tab:last-child { border-right: 0; }
+    .tab.active { background: var(--accent); color: #fff; }
+
+    .queue {
+      display: grid;
+      gap: 12px;
+    }
+
+    .card {
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      background: #fff;
+      overflow: hidden;
+    }
+
+    .card-head {
+      display: grid;
+      grid-template-columns: 1fr auto;
+      gap: 10px;
+      padding: 12px;
+      border-bottom: 1px solid #eef1f6;
+      background: #fffdfa;
+    }
+
+    .meta {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 7px;
+      align-items: center;
+      margin-bottom: 7px;
+    }
+
+    .pill {
+      display: inline-flex;
+      align-items: center;
+      min-height: 25px;
+      padding: 4px 8px;
+      border-radius: 999px;
+      background: #eff5f3;
+      color: #245b52;
+      font-size: 12px;
+      border: 1px solid #d5e6e1;
+    }
+
+    .pill.warn { background: #fff5e5; color: var(--warn); border-color: #f0d3a6; }
+    .pill.ok { background: #ecf8f1; color: var(--ok); border-color: #c7ebd5; }
+    .pill.gray { background: #f3f4f6; color: #667085; border-color: #e5e7eb; }
+
+    .card h2 {
+      margin: 0;
+      font-size: 17px;
+      line-height: 1.35;
+    }
+
+    .card-tools {
+      display: flex;
+      align-items: flex-start;
+      gap: 6px;
+      flex-wrap: wrap;
+      justify-content: flex-end;
+    }
+
+    .slides {
+      display: grid;
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+      gap: 10px;
+      padding: 12px;
+    }
+
+    .slide {
+      border: 1px solid #e8edf4;
+      background: #fbfcfe;
+      border-radius: 8px;
+      padding: 10px;
+      min-width: 0;
+    }
+
+    .slide-top {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 8px;
+      margin-bottom: 8px;
+    }
+
+    .slide-title { font-size: 12px; color: var(--muted); font-weight: 700; }
+    .slide p { margin: 0; line-height: 1.62; white-space: pre-wrap; overflow-wrap: anywhere; }
+
+    .log-area {
+      border-top: 1px solid #eef1f6;
+      padding: 12px;
+      display: grid;
+      grid-template-columns: repeat(6, minmax(0, 1fr));
+      gap: 8px;
+      background: #fcfcfd;
+    }
+
+    .log-area .wide { grid-column: span 2; }
+    .log-area .full { grid-column: 1 / -1; }
+
+    .empty {
+      border: 1px dashed #b8c1d2;
+      border-radius: 8px;
+      padding: 32px 16px;
+      text-align: center;
+      color: var(--muted);
+      background: rgba(255,255,255,.62);
+    }
+
+    .toast {
+      position: fixed;
+      right: 18px;
+      bottom: 18px;
+      background: #202124;
+      color: #fff;
+      padding: 10px 12px;
+      border-radius: 8px;
+      box-shadow: var(--shadow);
+      opacity: 0;
+      transform: translateY(8px);
+      pointer-events: none;
+      transition: .18s ease;
+      z-index: 20;
+    }
+
+    .toast.show { opacity: 1; transform: translateY(0); }
+
+    dialog {
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      width: min(860px, calc(100% - 24px));
+      padding: 0;
+      box-shadow: var(--shadow);
+    }
+
+    dialog::backdrop { background: rgba(24, 39, 75, .32); }
+    .modal-head, .modal-body, .modal-foot { padding: 14px; }
+    .modal-head { border-bottom: 1px solid var(--line); display: flex; justify-content: space-between; gap: 10px; align-items: center; }
+    .modal-head h2 { margin: 0; font-size: 18px; }
+    .modal-foot { border-top: 1px solid var(--line); display: flex; justify-content: flex-end; gap: 8px; }
+
+    .form-grid {
+      display: grid;
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+      gap: 10px;
+    }
+
+    .form-grid .full { grid-column: 1 / -1; }
+
+    @media (max-width: 920px) {
+      main { grid-template-columns: 1fr; }
+      aside { position: static; }
+      .slides { grid-template-columns: 1fr; }
+      .log-area { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+      .topbar { align-items: flex-start; flex-direction: column; padding: 12px 0; }
+      .actions { justify-content: flex-start; }
+    }
+
+    @media (max-width: 560px) {
+      .log-area, .form-grid { grid-template-columns: 1fr; }
+      .log-area .wide, .form-grid .full { grid-column: 1; }
+      .card-head { grid-template-columns: 1fr; }
+      .card-tools { justify-content: flex-start; }
+      .tabs { width: 100%; }
+      .tab { flex: 1; min-width: 0; }
+    }
+  </style>
+</head>
+<body>
+  <div class="shell">
+    <header>
+      <div class="topbar">
+        <div>
+          <h1>SNS AutoManager Lite</h1>
+          <div class="subtitle">Codexで作った投稿を、そのまま運ぶための投稿キュー</div>
+        </div>
+        <div class="actions">
+          <button class="btn" id="openImport">mdから取り込み</button>
+          <button class="btn" id="openAdd">投稿を追加</button>
+          <button class="btn" id="loadSheets">Sheets読込</button>
+          <button class="btn" id="saveSheets">Sheets保存</button>
+          <button class="btn" id="exportCsv">ログCSV</button>
+          <button class="btn danger" id="resetData">初期化</button>
+        </div>
+      </div>
+    </header>
+
+    <main>
+      <aside>
+        <p class="panel-title">絞り込み</p>
+        <div class="filters">
+          <div class="field">
+            <label for="accountFilter">アカウント</label>
+            <select id="accountFilter">
+              <option value="all">すべて</option>
+              <option value="まり小学校受験">まり小学校受験</option>
+              <option value="まり教育AI">まり教育AI</option>
+              <option value="七田式">七田式</option>
+            </select>
+          </div>
+          <div class="field">
+            <label for="statusFilter">状態</label>
+            <select id="statusFilter">
+              <option value="all">すべて</option>
+              <option value="draft">下書き</option>
+              <option value="scheduled">投稿予定</option>
+              <option value="posted">投稿済み</option>
+            </select>
+          </div>
+          <div class="field">
+            <label for="searchInput">検索</label>
+            <input id="searchInput" type="search" placeholder="テーマ、本文、媒体">
+          </div>
+        </div>
+
+        <div class="stats">
+          <div class="stat"><b id="statTotal">0</b><span>投稿キュー</span></div>
+          <div class="stat"><b id="statPosted">0</b><span>投稿済み</span></div>
+          <div class="stat"><b id="statViews">0</b><span>表示数合計</span></div>
+          <div class="stat"><b id="statTodo">0</b><span>未投稿</span></div>
+        </div>
+
+        <p class="panel-title">使い方</p>
+        <div class="subtitle">
+          Codexのmdを貼り付けて取り込み、各スライドをコピーして投稿します。投稿ボタンは押しません。URLと数値だけ記録します。
+        </div>
+      </aside>
+
+      <section class="workspace">
+        <div class="toolbar">
+          <div class="tabs" role="tablist" aria-label="time tabs">
+            <button class="tab active" data-time="all">全部</button>
+            <button class="tab" data-time="朝">朝</button>
+            <button class="tab" data-time="昼">昼</button>
+            <button class="tab" data-time="夜">夜</button>
+          </div>
+          <button class="btn primary" id="copyToday">表示中をまとめてコピー</button>
+        </div>
+        <div class="queue" id="queue"></div>
+      </section>
+    </main>
+  </div>
+
+  <dialog id="importDialog">
+    <div class="modal-head">
+      <h2>mdから取り込み</h2>
+      <button class="btn small" data-close="importDialog">閉じる</button>
+    </div>
+    <div class="modal-body">
+      <div class="field">
+        <label for="mdInput">今日の投稿mdを貼り付け</label>
+        <textarea id="mdInput" style="min-height: 360px;" placeholder="today-post-xxxx.md の中身をここに貼り付け"></textarea>
+      </div>
+      <div class="subtitle">見出しとコードブロックを読み取り、3つのコードブロックを1セットとして投稿キュー化します。</div>
+    </div>
+    <div class="modal-foot">
+      <button class="btn" data-close="importDialog">キャンセル</button>
+      <button class="btn primary" id="importMd">取り込む</button>
+    </div>
+  </dialog>
+
+  <dialog id="addDialog">
+    <form method="dialog" id="addForm">
+      <div class="modal-head">
+        <h2>投稿を追加</h2>
+        <button class="btn small" data-close="addDialog" type="button">閉じる</button>
+      </div>
+      <div class="modal-body">
+        <div class="form-grid">
+          <div class="field">
+            <label>アカウント</label>
+            <select name="account">
+              <option>まり小学校受験</option>
+              <option>まり教育AI</option>
+              <option>七田式</option>
+            </select>
+          </div>
+          <div class="field">
+            <label>媒体</label>
+            <select name="platform">
+              <option>Threads</option>
+              <option>X</option>
+              <option>note</option>
+              <option>Instagram</option>
+            </select>
+          </div>
+          <div class="field">
+            <label>時間帯</label>
+            <select name="timeSlot">
+              <option>朝</option>
+              <option>昼</option>
+              <option>夜</option>
+              <option>未定</option>
+            </select>
+          </div>
+          <div class="field full">
+            <label>テーマ</label>
+            <input name="theme" placeholder="例: 小学校受験って本当に必要？">
+          </div>
+          <div class="field full">
+            <label>1枚目</label>
+            <textarea name="slide1"></textarea>
+          </div>
+          <div class="field full">
+            <label>2枚目</label>
+            <textarea name="slide2"></textarea>
+          </div>
+          <div class="field full">
+            <label>3枚目</label>
+            <textarea name="slide3"></textarea>
+          </div>
+        </div>
+      </div>
+      <div class="modal-foot">
+        <button class="btn" type="button" data-close="addDialog">キャンセル</button>
+        <button class="btn primary" type="submit">追加</button>
+      </div>
+    </form>
+  </dialog>
+
+  <div class="toast" id="toast">コピーしました</div>
+
+  <script>
+    const STORAGE_KEY = "snsAutoManagerLite.v1";
+    const SHEET_API_URL = "https://script.google.com/macros/s/AKfycbzBdCYfGQWZDl7XySQbQ9qV6p750UdnHY4s66gpGaTuqUgKb32a4fMaw2fV_qSBZoFw0Q/exec";
+    const SHEET_API_KEY = "mari-sns-auto-2026";
+
+    const seedItems = [
+      {
+        id: crypto.randomUUID(),
+        date: "2026-06-22",
+        account: "まり教育AI",
+        platform: "Threads / X",
+        timeSlot: "昼",
+        theme: "AI初心者のテスト前",
+        status: "draft",
+        slides: [
+          "ChatGPTを開いたけど、最初の一言が分からないママへ。テスト前はこれだけで大丈夫です。",
+          "AIを使いたいと思っても、最初に何を書けばいいか分からない人は多いです。「プロンプト」と言われても難しいし、テスト範囲を全部入れるのも面倒。まずは一文で大丈夫です。「小学生のテスト前です。今日10分でできる勉強を3つに分けてください。」これだけで最初の形は作れます。",
+          "慣れてきたら、学年、テストまでの日数、苦手な単元を足せばOKです。最初から完璧に使わなくていい。AIは難しい人のものではなく、親の「今日何からやる？」を軽くする道具です。家庭で使える教育AIの始め方は、プロフィールの固定投稿から受け取れます。"
+        ],
+        metrics: {}
+      },
+      {
+        id: crypto.randomUUID(),
+        date: "2026-06-22",
+        account: "まり小学校受験",
+        platform: "Threads / X",
+        timeSlot: "夜",
+        theme: "本番で戻る手順",
+        status: "draft",
+        slides: [
+          "本番で止まる子に、家で練習してほしい「戻り方」は5つです。",
+          "本番で止まる子は、分からないから止まるだけではありません。見本を見落とす、指示を途中で忘れる、線がずれて焦る、隣の子が気になる、間違えた後に戻れない。ここで必要なのは、もっと頑張ることではなく、止まった時に自分で戻る手順です。",
+          "家で練習する戻り方は5つです。見本に戻る、最初の指示を思い出す、ずれた場所を見る、手を一度置く、小さくやり直す。これを普段の「見本通りに描く課題」や指示行動に入れると、本番で崩れても立て直しやすくなります。家庭でできる準備は、プロフィールの固定投稿にある公式LINEから受け取れます。"
+        ],
+        metrics: {}
+      }
+    ];
+
+    let state = loadState();
+    let activeTime = "all";
+
+    const els = {
+      queue: document.getElementById("queue"),
+      accountFilter: document.getElementById("accountFilter"),
+      statusFilter: document.getElementById("statusFilter"),
+      searchInput: document.getElementById("searchInput"),
+      statTotal: document.getElementById("statTotal"),
+      statPosted: document.getElementById("statPosted"),
+      statViews: document.getElementById("statViews"),
+      statTodo: document.getElementById("statTodo"),
+      toast: document.getElementById("toast"),
+      importDialog: document.getElementById("importDialog"),
+      addDialog: document.getElementById("addDialog"),
+      mdInput: document.getElementById("mdInput")
+    };
+
+    function loadState() {
+      const raw = localStorage.getItem(STORAGE_KEY);
+      if (!raw) return { items: seedItems };
+      try {
+        const parsed = JSON.parse(raw);
+        return { items: Array.isArray(parsed.items) ? parsed.items : seedItems };
+      } catch {
+        return { items: seedItems };
+      }
+    }
+
+    function saveState() {
+      localStorage.setItem(STORAGE_KEY, JSON.stringify(state));
+    }
+
+    function escapeHtml(text = "") {
+      return String(text)
+        .replaceAll("&", "&amp;")
+        .replaceAll("<", "&lt;")
+        .replaceAll(">", "&gt;")
+        .replaceAll('"', "&quot;");
+    }
+
+    function showToast(message) {
+      els.toast.textContent = message;
+      els.toast.classList.add("show");
+      setTimeout(() => els.toast.classList.remove("show"), 1400);
+    }
+
+    async function copyText(text) {
+      try {
+        await navigator.clipboard.writeText(text);
+        showToast("コピーしました");
+      } catch {
+        const area = document.createElement("textarea");
+        area.value = text;
+        document.body.appendChild(area);
+        area.select();
+        document.execCommand("copy");
+        area.remove();
+        showToast("コピーしました");
+      }
+    }
+
+    function filteredItems() {
+      const account = els.accountFilter.value;
+      const status = els.statusFilter.value;
+      const query = els.searchInput.value.trim().toLowerCase();
+      return state.items.filter(item => {
+        const text = [item.account, item.platform, item.timeSlot, item.theme, ...(item.slides || [])].join(" ").toLowerCase();
+        return (account === "all" || item.account === account)
+          && (status === "all" || item.status === status)
+          && (activeTime === "all" || item.timeSlot === activeTime)
+          && (!query || text.includes(query));
+      });
+    }
+
+    function statusLabel(status) {
+      if (status === "posted") return "投稿済み";
+      if (status === "scheduled") return "投稿予定";
+      return "下書き";
+    }
+
+    function renderStats() {
+      const total = state.items.length;
+      const posted = state.items.filter(item => item.status === "posted").length;
+      const views = state.items.reduce((sum, item) => sum + (Number(item.metrics?.views) || 0), 0);
+      els.statTotal.textContent = total;
+      els.statPosted.textContent = posted;
+      els.statViews.textContent = views.toLocaleString("ja-JP");
+      els.statTodo.textContent = total - posted;
+    }
+
+    function render() {
+      renderStats();
+      const items = filteredItems();
+      if (!items.length) {
+        els.queue.innerHTML = '<div class="empty">表示できる投稿がありません。mdから取り込むか、投稿を追加してください。</div>';
+        return;
+      }
+      els.queue.innerHTML = items.map(item => cardTemplate(item)).join("");
+    }
+
+    function cardTemplate(item) {
+      const statusClass = item.status === "posted" ? "ok" : item.status === "scheduled" ? "warn" : "gray";
+      const slides = (item.slides || ["", "", ""]).slice(0, 3);
+      return `
+        <article class="card" data-id="${item.id}">
+          <div class="card-head">
+            <div>
+              <div class="meta">
+                <span class="pill">${escapeHtml(item.account)}</span>
+                <span class="pill">${escapeHtml(item.platform)}</span>
+                <span class="pill">${escapeHtml(item.timeSlot || "未定")}</span>
+                <span class="pill ${statusClass}">${statusLabel(item.status)}</span>
+              </div>
+              <h2>${escapeHtml(item.theme || slides[0] || "無題")}</h2>
+            </div>
+            <div class="card-tools">
+              <button class="btn small" data-action="copyAll">3枚コピー</button>
+              <button class="btn small" data-action="openXDraft">X下書き</button>
+              <button class="btn small" data-action="openThreadsDraft">Threads下書き</button>
+              <button class="btn small" data-action="toggleStatus">${item.status === "posted" ? "未投稿へ" : "投稿済み"}</button>
+              <button class="btn small danger" data-action="delete">削除</button>
+            </div>
+          </div>
+          <div class="slides">
+            ${slides.map((slide, index) => `
+              <section class="slide">
+                <div class="slide-top">
+                  <span class="slide-title">${index + 1}枚目</span>
+                  <button class="btn small" data-action="copySlide" data-slide="${index}">コピー</button>
+                </div>
+                <p>${escapeHtml(slide)}</p>
+              </section>
+            `).join("")}
+          </div>
+          <div class="log-area">
+            <div class="field wide">
+              <label>投稿URL</label>
+              <input data-field="url" value="${escapeHtml(item.metrics?.url || "")}" placeholder="https://">
+            </div>
+            <div class="field">
+              <label>表示数</label>
+              <input data-field="views" inputmode="numeric" value="${escapeHtml(item.metrics?.views || "")}">
+            </div>
+            <div class="field">
+              <label>いいね</label>
+              <input data-field="likes" inputmode="numeric" value="${escapeHtml(item.metrics?.likes || "")}">
+            </div>
+            <div class="field">
+              <label>返信</label>
+              <input data-field="replies" inputmode="numeric" value="${escapeHtml(item.metrics?.replies || "")}">
+            </div>
+            <div class="field">
+              <label>保存</label>
+              <input data-field="saves" inputmode="numeric" value="${escapeHtml(item.metrics?.saves || "")}">
+            </div>
+            <div class="field full">
+              <label>メモ</label>
+              <input data-field="memo" value="${escapeHtml(item.metrics?.memo || "")}" placeholder="伸びた理由、次回改善など">
+            </div>
+          </div>
+        </article>
+      `;
+    }
+
+    function findItem(card) {
+      return state.items.find(item => item.id === card.dataset.id);
+    }
+
+    function parseMd(md) {
+      const lines = md.split(/\r?\n/);
+      const items = [];
+      let currentHeading = "";
+      let currentAccount = "";
+      let currentTime = "未定";
+      let codeBuffer = [];
+      let inCode = false;
+      let codeText = "";
+
+      const flushGroup = () => {
+        while (codeBuffer.length >= 3) {
+          const slides = codeBuffer.splice(0, 3);
+          const heading = currentHeading || slides[0].slice(0, 32);
+          items.push({
+            id: crypto.randomUUID(),
+            date: new Date().toISOString().slice(0, 10),
+            account: currentAccount || guessAccount(heading),
+            platform: "Threads / X",
+            timeSlot: currentTime,
+            theme: cleanHeading(heading),
+            status: "draft",
+            slides,
+            metrics: {}
+          });
+        }
+      };
+
+      for (const line of lines) {
+        const headingMatch = line.match(/^#{2,4}\s+(.+)$/);
+        if (headingMatch && !inCode) {
+          flushGroup();
+          currentHeading = headingMatch[1].trim();
+          currentAccount = guessAccount(currentHeading);
+          currentTime = guessTime(currentHeading);
+          continue;
+        }
+        if (line.startsWith("```")) {
+          if (!inCode) {
+            inCode = true;
+            codeText = "";
+          } else {
+            inCode = false;
+            const text = codeText.trim();
+            if (text) codeBuffer.push(text.replace(/\n+/g, " "));
+          }
+          continue;
+        }
+        if (inCode) codeText += (codeText ? "\n" : "") + line;
+      }
+      flushGroup();
+      return items.filter(item => item.slides.every(Boolean));
+    }
+
+    function guessAccount(text) {
+      if (/教育AI|まり教育AI/.test(text)) return "まり教育AI";
+      if (/七田|しちだ/.test(text)) return "七田式";
+      if (/小学校受験|小受|まり小学校/.test(text)) return "まり小学校受験";
+      return "まり小学校受験";
+    }
+
+    function guessTime(text) {
+      if (/朝/.test(text)) return "朝";
+      if (/昼/.test(text)) return "昼";
+      if (/夜/.test(text)) return "夜";
+      return "未定";
+    }
+
+    function cleanHeading(text) {
+      return text.replace(/^(まり教育AI|まり小学校受験|七田式)\s*/g, "").replace(/(朝投稿|昼投稿|夜投稿)/g, "").trim() || "投稿";
+    }
+
+    function buildPostText(item) {
+      return (item.slides || []).filter(Boolean).join("\n\n");
+    }
+
+    async function openDraft(item, target) {
+      const text = buildPostText(item);
+      if (!text) {
+        showToast("本文がありません");
+        return;
+      }
+      const draftWindow = window.open("about:blank", "_blank");
+      await copyText(text);
+      if (target === "x") {
+        draftWindow.location.href = `https://x.com/intent/tweet?text=${encodeURIComponent(text)}`;
+        showToast("X下書きを開きました");
+        return;
+      }
+      draftWindow.location.href = "https://www.threads.com/";
+      showToast("本文をコピーしてThreadsを開きました");
+    }
+
+    function normalizeSheetItem(item) {
+      const slides = item.slides || [item.slide1 || "", item.slide2 || "", item.slide3 || ""];
+      return {
+        id: item.id || crypto.randomUUID(),
+        date: item.date || new Date().toISOString().slice(0, 10),
+        account: item.account || "まり小学校受験",
+        platform: item.platform || "Threads / X",
+        timeSlot: item.timeSlot || "未定",
+        theme: item.theme || slides[0] || "投稿",
+        status: item.status || "draft",
+        slides: [slides[0] || "", slides[1] || "", slides[2] || ""],
+        metrics: {
+          url: item.postUrl || item.metrics?.url || "",
+          views: item.views || item.metrics?.views || "",
+          likes: item.likes || item.metrics?.likes || "",
+          replies: item.replies || item.metrics?.replies || "",
+          reposts: item.reposts || item.metrics?.reposts || "",
+          saves: item.saves || item.metrics?.saves || "",
+          followersDelta: item.followersDelta || item.metrics?.followersDelta || "",
+          memo: item.memo || item.metrics?.memo || ""
+        },
+        createdAt: item.createdAt || new Date().toISOString(),
+        updatedAt: item.updatedAt || new Date().toISOString()
+      };
+    }
+
+    function toSheetPayload(item) {
+      return {
+        id: item.id,
+        date: item.date || new Date().toISOString().slice(0, 10),
+        account: item.account || "",
+        platform: item.platform || "",
+        timeSlot: item.timeSlot || "",
+        theme: item.theme || "",
+        status: item.status || "draft",
+        slide1: item.slides?.[0] || "",
+        slide2: item.slides?.[1] || "",
+        slide3: item.slides?.[2] || "",
+        postUrl: item.metrics?.url || "",
+        views: item.metrics?.views || "",
+        likes: item.metrics?.likes || "",
+        replies: item.metrics?.replies || "",
+        reposts: item.metrics?.reposts || "",
+        saves: item.metrics?.saves || "",
+        followersDelta: item.metrics?.followersDelta || "",
+        memo: item.metrics?.memo || "",
+        createdAt: item.createdAt || new Date().toISOString(),
+        updatedAt: new Date().toISOString()
+      };
+    }
+
+    async function loadFromSheets() {
+      try {
+        showToast("Sheetsから読み込み中...");
+        const url = `${SHEET_API_URL}?action=list&key=${encodeURIComponent(SHEET_API_KEY)}`;
+        const response = await fetch(url);
+        const data = await response.json();
+        if (!data.ok) throw new Error(data.error || "load_failed");
+        state.items = (data.items || []).map(normalizeSheetItem);
+        saveState();
+        render();
+        showToast(`${state.items.length}件読み込みました`);
+      } catch (error) {
+        console.error(error);
+        showToast("Sheets読込に失敗しました");
+      }
+    }
+
+    async function saveToSheets() {
+      try {
+        showToast("Sheetsへ保存中...");
+        const response = await fetch(SHEET_API_URL, {
+          method: "POST",
+          headers: { "Content-Type": "text/plain;charset=utf-8" },
+          body: JSON.stringify({
+            key: SHEET_API_KEY,
+            action: "bulkUpsert",
+            items: state.items.map(toSheetPayload)
+          })
+        });
+        const data = await response.json();
+        if (!data.ok) throw new Error(data.error || "save_failed");
+        showToast(`${state.items.length}件保存しました`);
+      } catch (error) {
+        console.error(error);
+        showToast("Sheets保存に失敗しました");
+      }
+    }
+
+    function exportCsv() {
+      const header = ["date","account","platform","timeSlot","theme","status","url","views","likes","replies","saves","memo","slide1","slide2","slide3"];
+      const rows = state.items.map(item => [
+        item.date || "",
+        item.account || "",
+        item.platform || "",
+        item.timeSlot || "",
+        item.theme || "",
+        item.status || "",
+        item.metrics?.url || "",
+        item.metrics?.views || "",
+        item.metrics?.likes || "",
+        item.metrics?.replies || "",
+        item.metrics?.saves || "",
+        item.metrics?.memo || "",
+        item.slides?.[0] || "",
+        item.slides?.[1] || "",
+        item.slides?.[2] || ""
+      ]);
+      const csv = [header, ...rows].map(row => row.map(cell => `"${String(cell).replaceAll('"', '""')}"`).join(",")).join("\n");
+      const blob = new Blob(["\ufeff" + csv], { type: "text/csv;charset=utf-8" });
+      const link = document.createElement("a");
+      link.href = URL.createObjectURL(blob);
+      link.download = `sns-log-${new Date().toISOString().slice(0, 10)}.csv`;
+      link.click();
+      URL.revokeObjectURL(link.href);
+    }
+
+    document.querySelectorAll("[data-close]").forEach(button => {
+      button.addEventListener("click", () => document.getElementById(button.dataset.close).close());
+    });
+
+    document.getElementById("openImport").addEventListener("click", () => els.importDialog.showModal());
+    document.getElementById("openAdd").addEventListener("click", () => els.addDialog.showModal());
+    document.getElementById("exportCsv").addEventListener("click", exportCsv);
+    document.getElementById("loadSheets").addEventListener("click", loadFromSheets);
+    document.getElementById("saveSheets").addEventListener("click", saveToSheets);
+
+    document.getElementById("importMd").addEventListener("click", () => {
+      const imported = parseMd(els.mdInput.value);
+      if (!imported.length) {
+        showToast("取り込める投稿がありません");
+        return;
+      }
+      state.items = [...imported, ...state.items];
+      saveState();
+      els.importDialog.close();
+      els.mdInput.value = "";
+      render();
+      showToast(`${imported.length}件取り込みました`);
+    });
+
+    document.getElementById("addForm").addEventListener("submit", event => {
+      event.preventDefault();
+      const data = new FormData(event.currentTarget);
+      state.items.unshift({
+        id: crypto.randomUUID(),
+        date: new Date().toISOString().slice(0, 10),
+        account: data.get("account"),
+        platform: data.get("platform"),
+        timeSlot: data.get("timeSlot"),
+        theme: data.get("theme") || data.get("slide1"),
+        status: "draft",
+        slides: [data.get("slide1"), data.get("slide2"), data.get("slide3")],
+        metrics: {}
+      });
+      saveState();
+      event.currentTarget.reset();
+      els.addDialog.close();
+      render();
+      showToast("追加しました");
+    });
+
+    document.getElementById("resetData").addEventListener("click", () => {
+      if (!confirm("投稿キューと入力済みログを初期化しますか？")) return;
+      state = { items: seedItems.map(item => ({ ...item, id: crypto.randomUUID(), metrics: {} })) };
+      saveState();
+      render();
+      showToast("初期化しました");
+    });
+
+    document.querySelectorAll(".tab").forEach(tab => {
+      tab.addEventListener("click", () => {
+        document.querySelectorAll(".tab").forEach(t => t.classList.remove("active"));
+        tab.classList.add("active");
+        activeTime = tab.dataset.time;
+        render();
+      });
+    });
+
+    ["accountFilter", "statusFilter", "searchInput"].forEach(id => {
+      document.getElementById(id).addEventListener("input", render);
+    });
+
+    els.queue.addEventListener("click", event => {
+      const button = event.target.closest("button");
+      if (!button) return;
+      const card = event.target.closest(".card");
+      const item = findItem(card);
+      if (!item) return;
+      const action = button.dataset.action;
+      if (action === "copySlide") {
+        copyText(item.slides[Number(button.dataset.slide)] || "");
+      }
+      if (action === "copyAll") {
+        copyText((item.slides || []).join("\n\n"));
+      }
+      if (action === "toggleStatus") {
+        item.status = item.status === "posted" ? "draft" : "posted";
+        saveState();
+        render();
+      }
+      if (action === "delete") {
+        if (!confirm("この投稿を削除しますか？")) return;
+        state.items = state.items.filter(row => row.id !== item.id);
+        saveState();
+        render();
+      }
+    });
+
+    els.queue.addEventListener("input", event => {
+      const input = event.target.closest("[data-field]");
+      if (!input) return;
+      const card = event.target.closest(".card");
+      const item = findItem(card);
+      if (!item) return;
+      item.metrics = item.metrics || {};
+      item.metrics[input.dataset.field] = input.value;
+      saveState();
+      renderStats();
+    });
+
+    document.getElementById("copyToday").addEventListener("click", () => {
+      const text = filteredItems().map(item => {
+        return `【${item.account} ${item.timeSlot}】\n${(item.slides || []).join("\n\n")}`;
+      }).join("\n\n---\n\n");
+      if (!text) return showToast("コピーする投稿がありません");
+      copyText(text);
+    });
+
+    render();
+  </script>
+</body>
+</html>
+
+
+
+
