@@ -170,6 +170,51 @@
       flex-wrap: wrap;
     }
 
+    .calendar-bar {
+      display: grid;
+      grid-template-columns: repeat(4, minmax(0, 1fr)) minmax(180px, .8fr);
+      gap: 8px;
+      margin-bottom: 12px;
+    }
+
+    .date-pill {
+      border: 1px solid var(--line);
+      background: #fff;
+      border-radius: 8px;
+      padding: 10px;
+      color: var(--ink);
+      font-weight: 800;
+      cursor: pointer;
+      text-align: left;
+    }
+
+    .date-pill span {
+      display: block;
+      color: var(--muted);
+      font-size: 12px;
+      font-weight: 700;
+      margin-top: 2px;
+    }
+
+    .date-pill.active {
+      border-color: var(--accent);
+      background: #eef8f6;
+      color: var(--accent-strong);
+      box-shadow: 0 0 0 3px rgba(31, 122, 107, .1);
+    }
+
+    .calendar-picker {
+      display: flex;
+      flex-direction: column;
+      gap: 4px;
+    }
+
+    .calendar-picker label {
+      color: var(--muted);
+      font-size: 12px;
+      font-weight: 700;
+    }
+
     .tabs {
       display: inline-flex;
       border: 1px solid var(--line);
@@ -358,6 +403,8 @@
       .card-tools { justify-content: flex-start; }
       .tabs { width: 100%; }
       .tab { flex: 1; min-width: 0; }
+      .calendar-bar { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+      .calendar-picker { grid-column: 1 / -1; }
     }
   </style>
 </head>
@@ -423,6 +470,16 @@
       </aside>
 
       <section class="workspace">
+        <div class="calendar-bar" aria-label="date navigation">
+          <button class="date-pill active" data-date-mode="today">今日<span id="labelToday"></span></button>
+          <button class="date-pill" data-date-mode="tomorrow">明日<span id="labelTomorrow"></span></button>
+          <button class="date-pill" data-date-mode="dayAfter">明後日<span id="labelDayAfter"></span></button>
+          <button class="date-pill" data-date-mode="all">全部<span>全日程</span></button>
+          <div class="calendar-picker">
+            <label for="datePicker">表示日</label>
+            <input id="datePicker" type="date">
+          </div>
+        </div>
         <div class="toolbar">
           <div class="tabs" role="tablist" aria-label="time tabs">
             <button class="tab active" data-time="all">全部</button>
@@ -556,6 +613,7 @@
 
     let state = loadState();
     let activeTime = "all";
+    let activeDate = todayString();
 
     const els = {
       queue: document.getElementById("queue"),
@@ -569,8 +627,35 @@
       toast: document.getElementById("toast"),
       importDialog: document.getElementById("importDialog"),
       addDialog: document.getElementById("addDialog"),
-      mdInput: document.getElementById("mdInput")
+      mdInput: document.getElementById("mdInput"),
+      datePicker: document.getElementById("datePicker"),
+      labelToday: document.getElementById("labelToday"),
+      labelTomorrow: document.getElementById("labelTomorrow"),
+      labelDayAfter: document.getElementById("labelDayAfter")
     };
+
+    function todayString() {
+      const date = new Date();
+      date.setMinutes(date.getMinutes() - date.getTimezoneOffset());
+      return date.toISOString().slice(0, 10);
+    }
+
+    function addDays(value, days) {
+      const date = new Date(`${value}T00:00:00`);
+      date.setDate(date.getDate() + days);
+      date.setMinutes(date.getMinutes() - date.getTimezoneOffset());
+      return date.toISOString().slice(0, 10);
+    }
+
+    function shortDateLabel(value) {
+      if (value === "all") return "全日程";
+      const date = new Date(`${value}T00:00:00`);
+      return `${date.getMonth() + 1}/${date.getDate()}`;
+    }
+
+    function timeOrder(value) {
+      return { "朝": 1, "昼": 2, "夕方": 3, "夜": 4, "未定": 9 }[value] || 8;
+    }
 
     function loadState() {
       const raw = localStorage.getItem(STORAGE_KEY);
@@ -624,8 +709,13 @@
         const text = [item.account, item.platform, item.timeSlot, item.theme, ...(item.slides || [])].join(" ").toLowerCase();
         return (account === "all" || item.account === account)
           && (status === "all" || item.status === status)
+          && (activeDate === "all" || item.date === activeDate)
           && (activeTime === "all" || item.timeSlot === activeTime)
           && (!query || text.includes(query));
+      }).sort((a, b) => {
+        const dateCompare = String(a.date || "").localeCompare(String(b.date || ""));
+        if (dateCompare) return dateCompare;
+        return timeOrder(a.timeSlot) - timeOrder(b.timeSlot);
       });
     }
 
@@ -646,6 +736,7 @@
     }
 
     function render() {
+      syncDateControls();
       renderStats();
       const items = filteredItems();
       if (!items.length) {
@@ -653,6 +744,29 @@
         return;
       }
       els.queue.innerHTML = items.map(item => cardTemplate(item)).join("");
+    }
+
+    function syncDateControls() {
+      const today = todayString();
+      const tomorrow = addDays(today, 1);
+      const dayAfter = addDays(today, 2);
+      els.labelToday.textContent = shortDateLabel(today);
+      els.labelTomorrow.textContent = shortDateLabel(tomorrow);
+      els.labelDayAfter.textContent = shortDateLabel(dayAfter);
+      if (activeDate !== "all") els.datePicker.value = activeDate;
+      document.querySelectorAll("[data-date-mode]").forEach(button => {
+        const mode = button.dataset.dateMode;
+        const value = mode === "today" ? today
+          : mode === "tomorrow" ? tomorrow
+          : mode === "dayAfter" ? dayAfter
+          : "all";
+        button.classList.toggle("active", value === activeDate);
+      });
+    }
+
+    function setActiveDate(value) {
+      activeDate = value || todayString();
+      render();
     }
 
     function cardTemplate(item) {
@@ -1083,6 +1197,22 @@
         activeTime = tab.dataset.time;
         render();
       });
+    });
+
+    document.querySelectorAll("[data-date-mode]").forEach(button => {
+      button.addEventListener("click", () => {
+        const today = todayString();
+        const mode = button.dataset.dateMode;
+        const value = mode === "today" ? today
+          : mode === "tomorrow" ? addDays(today, 1)
+          : mode === "dayAfter" ? addDays(today, 2)
+          : "all";
+        setActiveDate(value);
+      });
+    });
+
+    els.datePicker.addEventListener("input", event => {
+      setActiveDate(event.target.value || todayString());
     });
 
     ["accountFilter", "statusFilter", "searchInput"].forEach(id => {
