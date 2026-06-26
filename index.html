@@ -301,6 +301,56 @@
       margin-top: 2px;
     }
 
+    .control-strip {
+      border: 1px solid var(--line);
+      background: #fff;
+      border-radius: 8px;
+      padding: 12px;
+      margin-bottom: 12px;
+      display: grid;
+      gap: 10px;
+    }
+
+    .switch-row {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+      flex-wrap: wrap;
+    }
+
+    .switch-label {
+      color: var(--muted);
+      font-size: 12px;
+      font-weight: 800;
+      min-width: 92px;
+    }
+
+    .segmented {
+      display: inline-flex;
+      border: 1px solid var(--line);
+      background: #fff;
+      border-radius: 8px;
+      overflow: hidden;
+      flex-wrap: wrap;
+    }
+
+    .segmented button {
+      border: 0;
+      border-right: 1px solid var(--line);
+      background: #fff;
+      padding: 8px 11px;
+      cursor: pointer;
+      font-size: 13px;
+      font-weight: 800;
+      min-height: 36px;
+    }
+
+    .segmented button:last-child { border-right: 0; }
+    .segmented button.active { background: #202124; color: #fff; }
+
+    .view-section[hidden] { display: none; }
+
     .analytics-shell {
       border: 1px solid var(--line);
       background: #fff;
@@ -910,6 +960,7 @@
       .calendar-picker { grid-column: 1 / -1; }
       .game-board { grid-template-columns: 1fr; }
       .quest-row { grid-template-columns: 1fr; }
+      .switch-row { align-items: flex-start; flex-direction: column; }
       .analytics-head { flex-direction: column; }
       .analytics-kpis { grid-template-columns: repeat(2, minmax(0, 1fr)); }
       .analytics-grid { grid-template-columns: 1fr; }
@@ -987,6 +1038,31 @@
       </aside>
 
       <section class="workspace">
+        <div class="control-strip">
+          <div class="switch-row">
+            <div>
+              <div class="switch-label">表示アカウント</div>
+              <div class="subtitle" id="accountScopeText">すべてのアカウントを表示中</div>
+            </div>
+            <div class="segmented" aria-label="account switch">
+              <button class="active" data-account-scope="all" type="button">すべて</button>
+              <button data-account-scope="まり小学校受験" type="button">小学校受験</button>
+              <button data-account-scope="まり教育AI" type="button">教育AI</button>
+              <button data-account-scope="七田式" type="button">七田式</button>
+            </div>
+          </div>
+          <div class="switch-row">
+            <div>
+              <div class="switch-label">表示ページ</div>
+              <div class="subtitle">カレンダーで予約、分析で伸びた投稿を確認します。</div>
+            </div>
+            <div class="segmented" aria-label="page switch">
+              <button class="active" data-view-switch="calendar" type="button">カレンダー</button>
+              <button data-view-switch="analytics" type="button">分析</button>
+            </div>
+          </div>
+        </div>
+
         <div class="game-board">
           <div class="score-card hero-score">
             <div class="score-label">今月のミッション</div>
@@ -1024,7 +1100,7 @@
           </div>
         </div>
 
-        <section class="analytics-shell">
+        <section class="analytics-shell view-section" data-view-panel="analytics" hidden>
           <div class="analytics-head">
             <div>
               <div class="panel-title">分析</div>
@@ -1057,6 +1133,7 @@
           </div>
         </section>
 
+        <section class="view-section" data-view-panel="calendar">
         <div class="planner-grid">
           <section class="draft-rail">
             <div class="panel-title">未予約の下書き</div>
@@ -1102,6 +1179,7 @@
           <button class="btn primary" id="copyToday">表示中をまとめてコピー</button>
         </div>
         <div class="queue" id="queue"></div>
+        </section>
       </section>
     </main>
   </div>
@@ -1230,6 +1308,7 @@
     let state = loadState();
     let activeTime = "all";
     let activeDate = todayString();
+    let activeView = "calendar";
     let analyticsPeriod = 14;
 
     const els = {
@@ -1253,6 +1332,7 @@
       streakText: document.getElementById("streakText"),
       bestPostText: document.getElementById("bestPostText"),
       formatMixText: document.getElementById("formatMixText"),
+      accountScopeText: document.getElementById("accountScopeText"),
       monthSummary: document.getElementById("monthSummary"),
       monthCalendar: document.getElementById("monthCalendar"),
       weekSchedule: document.getElementById("weekSchedule"),
@@ -1366,6 +1446,19 @@
       });
     }
 
+    function currentAccount() {
+      return els.accountFilter.value || "all";
+    }
+
+    function accountMatches(item) {
+      const account = currentAccount();
+      return account === "all" || item.account === account;
+    }
+
+    function accountScopedItems(items = state.items) {
+      return items.filter(accountMatches);
+    }
+
     function statusLabel(status) {
       if (status === "posted") return "投稿済み";
       if (status === "scheduled") return "投稿予定";
@@ -1374,7 +1467,7 @@
 
     function renderStats() {
       const monthKey = (activeDate === "all" ? todayString() : activeDate).slice(0, 7);
-      const monthItems = state.items.filter(item => String(item.date || "").startsWith(monthKey));
+      const monthItems = accountScopedItems().filter(item => String(item.date || "").startsWith(monthKey));
       const posted = monthItems.filter(item => item.status === "posted").length;
       const views = monthItems.reduce((sum, item) => sum + (Number(item.metrics?.views) || 0), 0);
       const best = [...monthItems].sort((a, b) => (Number(b.metrics?.views) || 0) - (Number(a.metrics?.views) || 0))[0];
@@ -1441,6 +1534,8 @@
     }
 
     function render() {
+      syncAccountControls();
+      syncViewControls();
       syncDateControls();
       renderStats();
       renderAnalytics();
@@ -1453,6 +1548,24 @@
         return;
       }
       els.queue.innerHTML = items.map(item => cardTemplate(item)).join("");
+    }
+
+    function syncAccountControls() {
+      const account = currentAccount();
+      const label = account === "all" ? "すべてのアカウント" : account;
+      els.accountScopeText.textContent = `${label}を表示中`;
+      document.querySelectorAll("[data-account-scope]").forEach(button => {
+        button.classList.toggle("active", button.dataset.accountScope === account);
+      });
+    }
+
+    function syncViewControls() {
+      document.querySelectorAll("[data-view-switch]").forEach(button => {
+        button.classList.toggle("active", button.dataset.viewSwitch === activeView);
+      });
+      document.querySelectorAll("[data-view-panel]").forEach(panel => {
+        panel.hidden = panel.dataset.viewPanel !== activeView;
+      });
     }
 
     function syncDateControls() {
@@ -1511,7 +1624,7 @@
         const date = new Date(start);
         date.setDate(start.getDate() + i);
         const dateString = toDateString(date);
-        const dayItems = state.items.filter(item => item.date === dateString);
+        const dayItems = accountScopedItems().filter(item => item.date === dateString);
         const dayViews = dayItems.reduce((sum, item) => sum + (Number(item.metrics?.views) || 0), 0);
         const isHot = dayViews >= 1000;
         const classes = [
@@ -1543,7 +1656,7 @@
       const end = new Date(`${todayString()}T23:59:59`);
       const start = new Date(end);
       start.setDate(end.getDate() - days + 1);
-      return state.items.filter(item => {
+      return accountScopedItems().filter(item => {
         if (!item.date) return false;
         const date = new Date(`${item.date}T12:00:00`);
         return date >= start && date <= end;
@@ -1647,6 +1760,7 @@
         date.setDate(start.getDate() + i);
         const dateString = toDateString(date);
         const dayItems = state.items
+          .filter(accountMatches)
           .filter(item => item.date === dateString)
           .sort((a, b) => timeOrder(a.timeSlot) - timeOrder(b.timeSlot));
         const slots = dayItems.length
@@ -2084,6 +2198,20 @@
         document.querySelectorAll(".tab").forEach(t => t.classList.remove("active"));
         tab.classList.add("active");
         activeTime = tab.dataset.time;
+        render();
+      });
+    });
+
+    document.querySelectorAll("[data-account-scope]").forEach(button => {
+      button.addEventListener("click", () => {
+        els.accountFilter.value = button.dataset.accountScope;
+        render();
+      });
+    });
+
+    document.querySelectorAll("[data-view-switch]").forEach(button => {
+      button.addEventListener("click", () => {
+        activeView = button.dataset.viewSwitch || "calendar";
         render();
       });
     });
