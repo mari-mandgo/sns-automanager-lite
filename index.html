@@ -301,6 +301,159 @@
       margin-top: 2px;
     }
 
+    .analytics-shell {
+      border: 1px solid var(--line);
+      background: #fff;
+      border-radius: 8px;
+      padding: 12px;
+      margin-bottom: 12px;
+    }
+
+    .analytics-head {
+      display: flex;
+      align-items: flex-start;
+      justify-content: space-between;
+      gap: 12px;
+      margin-bottom: 12px;
+    }
+
+    .period-tabs {
+      display: inline-flex;
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      overflow: hidden;
+      background: #fff;
+      flex-wrap: wrap;
+    }
+
+    .period-btn {
+      border: 0;
+      border-right: 1px solid var(--line);
+      background: #fff;
+      padding: 7px 10px;
+      cursor: pointer;
+      min-width: 64px;
+      font-size: 12px;
+      font-weight: 800;
+    }
+
+    .period-btn:last-child { border-right: 0; }
+    .period-btn.active { background: #202124; color: #fff; }
+
+    .analytics-kpis {
+      display: grid;
+      grid-template-columns: repeat(5, minmax(0, 1fr));
+      gap: 8px;
+      margin-bottom: 12px;
+    }
+
+    .analytics-kpi {
+      border: 1px solid #e7ecf4;
+      background: linear-gradient(180deg, #fff, #f8fbfa);
+      border-radius: 8px;
+      padding: 10px;
+      min-height: 88px;
+    }
+
+    .analytics-kpi span {
+      display: block;
+      color: var(--muted);
+      font-size: 12px;
+      font-weight: 800;
+      margin-bottom: 8px;
+    }
+
+    .analytics-kpi b {
+      display: block;
+      font-size: 22px;
+      line-height: 1.15;
+    }
+
+    .analytics-kpi small {
+      display: block;
+      color: var(--ok);
+      margin-top: 6px;
+      font-size: 12px;
+      font-weight: 800;
+    }
+
+    .analytics-grid {
+      display: grid;
+      grid-template-columns: minmax(0, 1.1fr) minmax(300px, .9fr);
+      gap: 12px;
+    }
+
+    .chart-panel,
+    .ranking-panel {
+      border: 1px solid #e7ecf4;
+      border-radius: 8px;
+      background: #fbfcfe;
+      padding: 12px;
+      min-width: 0;
+    }
+
+    .chart-bars {
+      height: 210px;
+      display: grid;
+      grid-auto-flow: column;
+      grid-auto-columns: minmax(32px, 1fr);
+      align-items: end;
+      gap: 6px;
+      border-bottom: 1px solid #dfe5ee;
+      padding: 12px 4px 0;
+      overflow-x: auto;
+    }
+
+    .bar-wrap {
+      display: grid;
+      align-items: end;
+      gap: 5px;
+      min-width: 32px;
+    }
+
+    .bar {
+      border-radius: 7px 7px 0 0;
+      background: linear-gradient(180deg, #1f7a6b, #9adbc6);
+      min-height: 4px;
+      position: relative;
+    }
+
+    .bar.hot { background: linear-gradient(180deg, #d94f70, #ffd166); }
+    .bar-label {
+      color: var(--muted);
+      font-size: 10px;
+      text-align: center;
+      white-space: nowrap;
+    }
+
+    .ranking-list {
+      display: grid;
+      gap: 8px;
+      max-height: 280px;
+      overflow: auto;
+    }
+
+    .ranking-item {
+      border: 1px solid #e6ebf2;
+      border-radius: 8px;
+      background: #fff;
+      padding: 9px;
+      display: grid;
+      gap: 5px;
+    }
+
+    .ranking-top {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .ranking-top b { font-size: 13px; line-height: 1.35; overflow-wrap: anywhere; }
+    .ranking-top span { font-size: 12px; font-weight: 900; color: var(--accent); white-space: nowrap; }
+    .ranking-meta { color: var(--muted); font-size: 12px; }
+    .analytics-note { color: var(--muted); font-size: 12px; line-height: 1.55; margin-top: 10px; }
+
     .month-shell {
       border: 1px solid var(--line);
       background: #fff;
@@ -757,10 +910,14 @@
       .calendar-picker { grid-column: 1 / -1; }
       .game-board { grid-template-columns: 1fr; }
       .quest-row { grid-template-columns: 1fr; }
+      .analytics-head { flex-direction: column; }
+      .analytics-kpis { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+      .analytics-grid { grid-template-columns: 1fr; }
       .month-head { flex-direction: column; }
       .legend { justify-content: flex-start; }
       .month-calendar { gap: 4px; }
       .week-schedule { grid-template-columns: 1fr; }
+      .analytics-kpis { grid-template-columns: 1fr; }
       .cal-day { min-height: 76px; padding: 5px; }
       .cal-chip { font-size: 10px; }
     }
@@ -866,6 +1023,39 @@
             <div><b id="formatMixText">型ミックス準備中</b><small>単発・3スライド・記事を混ぜる</small></div>
           </div>
         </div>
+
+        <section class="analytics-shell">
+          <div class="analytics-head">
+            <div>
+              <div class="panel-title">分析</div>
+              <div class="subtitle" id="analyticsSummary">投稿数、表示数、反応、勝ち投稿を確認します。</div>
+            </div>
+            <div class="period-tabs" aria-label="analytics period">
+              <button class="period-btn" data-period="7">7日間</button>
+              <button class="period-btn active" data-period="14">14日間</button>
+              <button class="period-btn" data-period="30">1ヶ月</button>
+              <button class="period-btn" data-period="90">3ヶ月</button>
+            </div>
+          </div>
+          <div class="analytics-kpis">
+            <div class="analytics-kpi"><span>投稿</span><b id="analyticsPosts">0</b><small id="analyticsPostsSub">期間内</small></div>
+            <div class="analytics-kpi"><span>表示数</span><b id="analyticsViews">0</b><small id="analyticsViewsSub">自動取得待ち</small></div>
+            <div class="analytics-kpi"><span>反応</span><b id="analyticsEngagements">0</b><small id="analyticsEngagementsSub">いいね+返信+保存</small></div>
+            <div class="analytics-kpi"><span>エンゲージ率</span><b id="analyticsEngRate">0%</b><small id="analyticsEngRateSub">反応 ÷ 表示数</small></div>
+            <div class="analytics-kpi"><span>フォロワー増</span><b id="analyticsFollowers">0</b><small id="analyticsFollowersSub">入力分のみ</small></div>
+          </div>
+          <div class="analytics-grid">
+            <div class="chart-panel">
+              <div class="panel-title">表示数の推移</div>
+              <div class="chart-bars" id="viewsChart"></div>
+              <div class="analytics-note">Xのインプ自動取得が入ると、日別の伸びがここに反映されます。</div>
+            </div>
+            <div class="ranking-panel">
+              <div class="panel-title">伸びた投稿ランキング</div>
+              <div class="ranking-list" id="rankingList"></div>
+            </div>
+          </div>
+        </section>
 
         <div class="planner-grid">
           <section class="draft-rail">
@@ -1040,6 +1230,7 @@
     let state = loadState();
     let activeTime = "all";
     let activeDate = todayString();
+    let analyticsPeriod = 14;
 
     const els = {
       queue: document.getElementById("queue"),
@@ -1066,6 +1257,19 @@
       monthCalendar: document.getElementById("monthCalendar"),
       weekSchedule: document.getElementById("weekSchedule"),
       unscheduledDrafts: document.getElementById("unscheduledDrafts"),
+      analyticsSummary: document.getElementById("analyticsSummary"),
+      analyticsPosts: document.getElementById("analyticsPosts"),
+      analyticsPostsSub: document.getElementById("analyticsPostsSub"),
+      analyticsViews: document.getElementById("analyticsViews"),
+      analyticsViewsSub: document.getElementById("analyticsViewsSub"),
+      analyticsEngagements: document.getElementById("analyticsEngagements"),
+      analyticsEngagementsSub: document.getElementById("analyticsEngagementsSub"),
+      analyticsEngRate: document.getElementById("analyticsEngRate"),
+      analyticsEngRateSub: document.getElementById("analyticsEngRateSub"),
+      analyticsFollowers: document.getElementById("analyticsFollowers"),
+      analyticsFollowersSub: document.getElementById("analyticsFollowersSub"),
+      viewsChart: document.getElementById("viewsChart"),
+      rankingList: document.getElementById("rankingList"),
       toast: document.getElementById("toast"),
       importDialog: document.getElementById("importDialog"),
       addDialog: document.getElementById("addDialog"),
@@ -1239,6 +1443,7 @@
     function render() {
       syncDateControls();
       renderStats();
+      renderAnalytics();
       renderMonthCalendar();
       renderWeekSchedule();
       renderUnscheduledDrafts();
@@ -1332,6 +1537,103 @@
         `);
       }
       els.monthCalendar.innerHTML = cells.join("");
+    }
+
+    function periodItems(days = analyticsPeriod) {
+      const end = new Date(`${todayString()}T23:59:59`);
+      const start = new Date(end);
+      start.setDate(end.getDate() - days + 1);
+      return state.items.filter(item => {
+        if (!item.date) return false;
+        const date = new Date(`${item.date}T12:00:00`);
+        return date >= start && date <= end;
+      });
+    }
+
+    function sumMetric(items, key) {
+      return items.reduce((sum, item) => sum + (Number(item.metrics?.[key]) || 0), 0);
+    }
+
+    function itemEngagements(item) {
+      return (Number(item.metrics?.likes) || 0)
+        + (Number(item.metrics?.replies) || 0)
+        + (Number(item.metrics?.reposts) || 0)
+        + (Number(item.metrics?.saves) || 0);
+    }
+
+    function renderAnalytics() {
+      const items = periodItems();
+      const posted = items.filter(item => item.status === "posted" || Number(item.metrics?.views));
+      const views = sumMetric(items, "views");
+      const engagements = items.reduce((sum, item) => sum + itemEngagements(item), 0);
+      const followers = sumMetric(items, "followersDelta");
+      const rate = views ? (engagements / views) * 100 : 0;
+      const start = addDays(todayString(), -(analyticsPeriod - 1));
+      els.analyticsSummary.textContent = `${shortDateLabel(start)}〜${shortDateLabel(todayString())} の投稿 ${items.length}件、表示数 ${views.toLocaleString("ja-JP")} imp`;
+      els.analyticsPosts.textContent = items.length.toLocaleString("ja-JP");
+      els.analyticsPostsSub.textContent = `投稿済み ${posted.length}件`;
+      els.analyticsViews.textContent = views.toLocaleString("ja-JP");
+      els.analyticsViewsSub.textContent = views ? "期間内合計" : "自動取得待ち";
+      els.analyticsEngagements.textContent = engagements.toLocaleString("ja-JP");
+      els.analyticsEngagementsSub.textContent = `いいね ${sumMetric(items, "likes").toLocaleString("ja-JP")} / 返信 ${sumMetric(items, "replies").toLocaleString("ja-JP")}`;
+      els.analyticsEngRate.textContent = `${rate.toFixed(rate >= 10 ? 0 : 1)}%`;
+      els.analyticsEngRateSub.textContent = views ? "反応 ÷ 表示数" : "表示数入力後に計算";
+      els.analyticsFollowers.textContent = followers.toLocaleString("ja-JP");
+      els.analyticsFollowersSub.textContent = followers ? "期間内増減" : "入力分のみ";
+      renderViewsChart(items);
+      renderRanking(items);
+    }
+
+    function renderViewsChart(items) {
+      const map = new Map();
+      for (let i = analyticsPeriod - 1; i >= 0; i--) {
+        const date = addDays(todayString(), -i);
+        map.set(date, 0);
+      }
+      items.forEach(item => {
+        if (!map.has(item.date)) return;
+        map.set(item.date, map.get(item.date) + (Number(item.metrics?.views) || 0));
+      });
+      const values = [...map.values()];
+      const max = Math.max(1, ...values);
+      els.viewsChart.innerHTML = [...map.entries()].map(([date, value]) => {
+        const height = Math.max(4, Math.round((value / max) * 180));
+        const hot = value >= 1000 ? "hot" : "";
+        return `
+          <div class="bar-wrap" title="${date} ${value.toLocaleString("ja-JP")} imp">
+            <div class="bar ${hot}" style="height:${height}px"></div>
+            <div class="bar-label">${shortDateLabel(date)}</div>
+          </div>
+        `;
+      }).join("");
+    }
+
+    function renderRanking(items) {
+      const ranked = [...items]
+        .filter(item => Number(item.metrics?.views) || itemEngagements(item))
+        .sort((a, b) => {
+          const viewDiff = (Number(b.metrics?.views) || 0) - (Number(a.metrics?.views) || 0);
+          if (viewDiff) return viewDiff;
+          return itemEngagements(b) - itemEngagements(a);
+        })
+        .slice(0, 8);
+      if (!ranked.length) {
+        els.rankingList.innerHTML = '<div class="empty" style="padding:18px 8px;">表示数や反応を入れると、勝ち投稿がここに並びます</div>';
+        return;
+      }
+      els.rankingList.innerHTML = ranked.map((item, index) => {
+        const views = Number(item.metrics?.views) || 0;
+        const engagements = itemEngagements(item);
+        return `
+          <div class="ranking-item">
+            <div class="ranking-top">
+              <b>${index + 1}. ${escapeHtml(item.theme || item.slides?.[0] || "投稿")}</b>
+              <span>${views.toLocaleString("ja-JP")} imp</span>
+            </div>
+            <div class="ranking-meta">${escapeHtml(item.date || "未予約")}｜${escapeHtml(item.account)}｜${escapeHtml(item.platform)}｜反応 ${engagements.toLocaleString("ja-JP")}</div>
+          </div>
+        `;
+      }).join("");
     }
 
     function renderWeekSchedule() {
@@ -1786,6 +2088,15 @@
       });
     });
 
+    document.querySelectorAll("[data-period]").forEach(button => {
+      button.addEventListener("click", () => {
+        document.querySelectorAll("[data-period]").forEach(t => t.classList.remove("active"));
+        button.classList.add("active");
+        analyticsPeriod = Number(button.dataset.period) || 14;
+        renderAnalytics();
+      });
+    });
+
     document.querySelectorAll("[data-date-mode]").forEach(button => {
       button.addEventListener("click", () => {
         const today = todayString();
@@ -1876,6 +2187,7 @@
       item.metrics[input.dataset.field] = input.value;
       saveState();
       renderStats();
+      renderAnalytics();
     });
 
     els.queue.addEventListener("input", event => {
