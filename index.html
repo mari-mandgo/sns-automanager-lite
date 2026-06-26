@@ -160,6 +160,355 @@
 
     .stat b { display: block; font-size: 20px; line-height: 1.1; }
     .stat span { color: var(--muted); font-size: 12px; }
+    .wide-stat { grid-column: 1 / -1; }
+    .wide-stat b {
+      font-size: 14px;
+      line-height: 1.35;
+      overflow-wrap: anywhere;
+    }
+
+    .game-board {
+      display: grid;
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+      gap: 10px;
+      margin-bottom: 12px;
+    }
+
+    .score-card {
+      border: 1px solid #dce8e4;
+      background: linear-gradient(135deg, #ffffff 0%, #eef8f6 100%);
+      border-radius: 8px;
+      padding: 12px;
+      min-height: 112px;
+    }
+
+    .hero-score {
+      background:
+        linear-gradient(135deg, rgba(31, 122, 107, .12), rgba(217, 79, 112, .10)),
+        #fff;
+      border-color: rgba(31, 122, 107, .28);
+      position: relative;
+      overflow: hidden;
+    }
+
+    .hero-score::after {
+      content: "";
+      position: absolute;
+      width: 130px;
+      height: 130px;
+      border-radius: 50%;
+      right: -58px;
+      top: -64px;
+      background: radial-gradient(circle, rgba(255, 209, 102, .55), rgba(255, 209, 102, 0));
+      pointer-events: none;
+    }
+
+    .score-label {
+      color: var(--accent);
+      font-size: 12px;
+      font-weight: 800;
+      margin-bottom: 8px;
+    }
+
+    .score-main {
+      font-size: 18px;
+      font-weight: 900;
+      line-height: 1.35;
+      overflow-wrap: anywhere;
+    }
+
+    .score-sub {
+      color: var(--muted);
+      font-size: 12px;
+      line-height: 1.45;
+      margin-top: 8px;
+    }
+
+    .progress-wrap {
+      margin-top: 12px;
+      position: relative;
+      z-index: 1;
+    }
+
+    .progress-top {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 8px;
+      color: #1f5f55;
+      font-size: 12px;
+      font-weight: 900;
+      margin-bottom: 6px;
+    }
+
+    .progress-track {
+      height: 10px;
+      border-radius: 999px;
+      background: rgba(31, 122, 107, .12);
+      overflow: hidden;
+      border: 1px solid rgba(31, 122, 107, .16);
+    }
+
+    .progress-fill {
+      height: 100%;
+      width: 0%;
+      border-radius: inherit;
+      background: linear-gradient(90deg, #1f7a6b, #6fcf97, #ffd166);
+      transition: width .25s ease;
+    }
+
+    .quest-row {
+      display: grid;
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+      gap: 10px;
+      margin-bottom: 12px;
+    }
+
+    .quest-card {
+      border: 1px solid #e4eaf2;
+      background: rgba(255,255,255,.9);
+      border-radius: 8px;
+      padding: 10px;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      min-width: 0;
+    }
+
+    .quest-icon {
+      flex: 0 0 34px;
+      height: 34px;
+      border-radius: 8px;
+      display: grid;
+      place-items: center;
+      background: #202124;
+      color: #fff;
+      font-size: 12px;
+      font-weight: 900;
+    }
+
+    .quest-card b {
+      display: block;
+      font-size: 14px;
+      line-height: 1.35;
+      overflow-wrap: anywhere;
+    }
+
+    .quest-card small {
+      display: block;
+      color: var(--muted);
+      font-size: 12px;
+      margin-top: 2px;
+    }
+
+    .month-shell {
+      border: 1px solid var(--line);
+      background: #fff;
+      border-radius: 8px;
+      padding: 12px;
+      margin-bottom: 12px;
+    }
+
+    .planner-grid {
+      display: grid;
+      grid-template-columns: 260px minmax(0, 1fr);
+      gap: 12px;
+      align-items: stretch;
+      margin-bottom: 12px;
+    }
+
+    .draft-rail {
+      border: 1px solid var(--line);
+      background: #fff;
+      border-radius: 8px;
+      padding: 12px;
+      min-width: 0;
+    }
+
+    .draft-list {
+      display: grid;
+      gap: 8px;
+      max-height: 520px;
+      overflow: auto;
+      padding-right: 2px;
+    }
+
+    .draft-card {
+      border: 1px solid #e7ecf4;
+      background: #fbfcfe;
+      border-radius: 8px;
+      padding: 9px;
+      text-align: left;
+      cursor: pointer;
+      display: grid;
+      gap: 5px;
+    }
+
+    .draft-card:hover { border-color: var(--accent); background: #f2fbf8; }
+    .draft-card b { font-size: 13px; line-height: 1.35; }
+    .draft-card small { color: var(--muted); line-height: 1.35; }
+
+    .week-schedule {
+      display: grid;
+      grid-template-columns: repeat(7, minmax(0, 1fr));
+      gap: 6px;
+      margin-top: 12px;
+      border-top: 1px solid #eef1f6;
+      padding-top: 12px;
+    }
+
+    .week-day {
+      border: 1px solid #e6ebf2;
+      background: #fbfcfe;
+      border-radius: 8px;
+      min-height: 132px;
+      padding: 7px;
+      cursor: pointer;
+    }
+
+    .week-day.active { border-color: var(--accent); background: #effaf7; box-shadow: 0 0 0 3px rgba(31, 122, 107, .1); }
+    .week-day.today .week-date { background: var(--accent); color: #fff; }
+    .week-head { display: flex; align-items: center; justify-content: space-between; gap: 4px; margin-bottom: 7px; }
+    .week-name { color: var(--muted); font-size: 11px; font-weight: 800; }
+    .week-date {
+      width: 24px;
+      height: 24px;
+      border-radius: 999px;
+      display: inline-grid;
+      place-items: center;
+      font-weight: 900;
+      font-size: 12px;
+    }
+
+    .week-slot {
+      border-radius: 6px;
+      background: #f0f7f5;
+      color: #214f47;
+      padding: 4px 5px;
+      margin-top: 4px;
+      font-size: 11px;
+      font-weight: 800;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+    }
+
+    .week-slot.posted { background: #c8f3dc; color: #12613a; }
+    .week-slot.scheduled { background: #fff2c2; color: #765400; }
+
+    .month-head {
+      display: flex;
+      align-items: flex-start;
+      justify-content: space-between;
+      gap: 12px;
+      margin-bottom: 10px;
+    }
+
+    .legend {
+      display: flex;
+      gap: 10px;
+      flex-wrap: wrap;
+      color: var(--muted);
+      font-size: 12px;
+      justify-content: flex-end;
+    }
+
+    .legend span {
+      display: inline-flex;
+      align-items: center;
+      gap: 5px;
+      white-space: nowrap;
+    }
+
+    .dot {
+      width: 9px;
+      height: 9px;
+      border-radius: 50%;
+      display: inline-block;
+      background: #d1d5db;
+    }
+
+    .dot.draft { background: #87d9b0; }
+    .dot.scheduled { background: #ffd166; }
+    .dot.posted { background: #26a269; }
+    .dot.hot { background: #ff5a7a; }
+
+    .month-calendar {
+      display: grid;
+      grid-template-columns: repeat(7, minmax(0, 1fr));
+      gap: 6px;
+    }
+
+    .cal-weekday {
+      color: var(--muted);
+      font-size: 12px;
+      font-weight: 800;
+      text-align: center;
+      padding: 4px 0;
+    }
+
+    .cal-day {
+      min-height: 92px;
+      border: 1px solid #e6ebf2;
+      background: #f8fbfa;
+      border-radius: 8px;
+      padding: 7px;
+      cursor: pointer;
+      display: flex;
+      flex-direction: column;
+      gap: 5px;
+      transition: .15s ease;
+    }
+
+    .cal-day:hover { border-color: var(--accent); transform: translateY(-1px); }
+    .cal-day.active { border-color: var(--accent); box-shadow: 0 0 0 3px rgba(31, 122, 107, .12); background: #effaf7; }
+    .cal-day.other-month { opacity: .42; }
+    .cal-day.today .cal-num { background: var(--accent); color: #fff; }
+
+    .cal-top {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 6px;
+    }
+
+    .cal-num {
+      width: 24px;
+      height: 24px;
+      border-radius: 999px;
+      display: inline-grid;
+      place-items: center;
+      font-weight: 900;
+      font-size: 13px;
+    }
+
+    .cal-count {
+      color: var(--muted);
+      font-size: 11px;
+      font-weight: 800;
+    }
+
+    .cal-times {
+      display: grid;
+      gap: 4px;
+      margin-top: auto;
+    }
+
+    .cal-chip {
+      border-radius: 5px;
+      padding: 3px 5px;
+      background: #dff8e8;
+      color: #155a35;
+      font-size: 11px;
+      font-weight: 800;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+
+    .cal-chip.posted { background: #c8f3dc; color: #12613a; }
+    .cal-chip.scheduled { background: #fff2c2; color: #765400; }
+    .cal-chip.hot { background: #ffe0e8; color: #9b1c3d; }
 
     .toolbar {
       display: flex;
@@ -390,6 +739,7 @@
     @media (max-width: 920px) {
       main { grid-template-columns: 1fr; }
       aside { position: static; }
+      .planner-grid { grid-template-columns: 1fr; }
       .slides { grid-template-columns: 1fr; }
       .log-area { grid-template-columns: repeat(2, minmax(0, 1fr)); }
       .topbar { align-items: flex-start; flex-direction: column; padding: 12px 0; }
@@ -405,6 +755,14 @@
       .tab { flex: 1; min-width: 0; }
       .calendar-bar { grid-template-columns: repeat(2, minmax(0, 1fr)); }
       .calendar-picker { grid-column: 1 / -1; }
+      .game-board { grid-template-columns: 1fr; }
+      .quest-row { grid-template-columns: 1fr; }
+      .month-head { flex-direction: column; }
+      .legend { justify-content: flex-start; }
+      .month-calendar { gap: 4px; }
+      .week-schedule { grid-template-columns: 1fr; }
+      .cal-day { min-height: 76px; padding: 5px; }
+      .cal-chip { font-size: 10px; }
     }
   </style>
 </head>
@@ -413,8 +771,8 @@
     <header>
       <div class="topbar">
         <div>
-          <h1>SNS AutoManager Lite</h1>
-          <div class="subtitle">Codexで作った投稿を、そのまま運ぶための投稿キュー</div>
+          <h1>SNS Gamer Dashboard</h1>
+          <div class="subtitle">リサーチ、投稿予定、インプ分析、次の一手をまとめて見るSNS運用ボード</div>
         </div>
         <div class="actions">
           <button class="btn" id="openImport">mdから取り込み</button>
@@ -457,19 +815,83 @@
         </div>
 
         <div class="stats">
-          <div class="stat"><b id="statTotal">0</b><span>投稿キュー</span></div>
+          <div class="stat"><b id="statMonthPosts">0</b><span>今月の投稿</span></div>
           <div class="stat"><b id="statPosted">0</b><span>投稿済み</span></div>
-          <div class="stat"><b id="statViews">0</b><span>表示数合計</span></div>
-          <div class="stat"><b id="statTodo">0</b><span>未投稿</span></div>
+          <div class="stat"><b id="statViews">0</b><span>今月インプ</span></div>
+          <div class="stat"><b id="statBestViews">0</b><span>最高インプ</span></div>
+          <div class="stat wide-stat"><b id="statBestTheme">-</b><span>今月の勝ち投稿</span></div>
+          <div class="stat wide-stat"><b id="statNextMove">-</b><span>次の一手</span></div>
         </div>
 
         <p class="panel-title">使い方</p>
         <div class="subtitle">
-          Codexのmdを貼り付けて取り込み、各スライドをコピーして投稿します。投稿ボタンは押しません。URLと数値だけ記録します。
+          カレンダーで投稿予定を見て、投稿後に表示数・反応・メモを記録します。伸びた型を見つけて、翌日の投稿に続編化します。
         </div>
       </aside>
 
       <section class="workspace">
+        <div class="game-board">
+          <div class="score-card hero-score">
+            <div class="score-label">今月のミッション</div>
+            <div class="score-main" id="missionText">まずは投稿ログを貯める</div>
+            <div class="score-sub" id="missionSub">投稿数と表示数が入ると、次の一手が見えます。</div>
+            <div class="progress-wrap">
+              <div class="progress-top"><span id="rankBadge">Lv.1 Starter</span><span id="progressText">0%</span></div>
+              <div class="progress-track"><div class="progress-fill" id="progressFill"></div></div>
+            </div>
+          </div>
+          <div class="score-card">
+            <div class="score-label">勝ちパターン</div>
+            <div class="score-main" id="winningPattern">分析待ち</div>
+            <div class="score-sub">最高インプのテーマを続編化します。</div>
+          </div>
+          <div class="score-card">
+            <div class="score-label">今日の優先</div>
+            <div class="score-main" id="todayPriority">朝の投稿を確認</div>
+            <div class="score-sub">下書きから投稿し、URLと数値を記録します。</div>
+          </div>
+        </div>
+
+        <div class="quest-row">
+          <div class="quest-card">
+            <span class="quest-icon">01</span>
+            <div><b id="streakText">連続投稿 0日</b><small>まず3日続ける</small></div>
+          </div>
+          <div class="quest-card">
+            <span class="quest-icon">02</span>
+            <div><b id="bestPostText">最高投稿を探索中</b><small>1,000imp超えを続編化</small></div>
+          </div>
+          <div class="quest-card">
+            <span class="quest-icon">03</span>
+            <div><b id="formatMixText">型ミックス準備中</b><small>単発・3スライド・記事を混ぜる</small></div>
+          </div>
+        </div>
+
+        <div class="planner-grid">
+          <section class="draft-rail">
+            <div class="panel-title">未予約の下書き</div>
+            <div class="subtitle">日付未指定の投稿はここに残ります。日付を入れるとカレンダーに並びます。</div>
+            <div class="draft-list" id="unscheduledDrafts"></div>
+          </section>
+
+          <section class="month-shell">
+            <div class="month-head">
+              <div>
+                <div class="panel-title">投稿カレンダー</div>
+                <div class="subtitle" id="monthSummary">投稿予定と実績を日別に確認します。</div>
+              </div>
+              <div class="legend">
+                <span><i class="dot draft"></i>下書き</span>
+                <span><i class="dot scheduled"></i>予定</span>
+                <span><i class="dot posted"></i>投稿済み</span>
+                <span><i class="dot hot"></i>伸びた</span>
+              </div>
+            </div>
+            <div class="month-calendar" id="monthCalendar"></div>
+            <div class="week-schedule" id="weekSchedule"></div>
+          </section>
+        </div>
+
         <div class="calendar-bar" aria-label="date navigation">
           <button class="date-pill active" data-date-mode="today">今日<span id="labelToday"></span></button>
           <button class="date-pill" data-date-mode="tomorrow">明日<span id="labelTomorrow"></span></button>
@@ -502,9 +924,9 @@
     <div class="modal-body">
       <div class="field">
         <label for="mdInput">今日の投稿mdを貼り付け</label>
-        <textarea id="mdInput" style="min-height: 360px;" placeholder="today-post-xxxx.md の中身をここに貼り付け"></textarea>
+        <textarea id="mdInput" style="min-height: 360px;" placeholder="例: ## 2026-06-27 まり小学校受験 朝投稿 01&#10;```text&#10;1枚目&#10;```&#10;```text&#10;2枚目&#10;```&#10;```text&#10;3枚目&#10;```"></textarea>
       </div>
-      <div class="subtitle">見出しとコードブロックを読み取り、3つのコードブロックを1セットとして投稿キュー化します。</div>
+      <div class="subtitle">見出しの日付を読み取り、3つのコードブロックを1セットとして投稿キュー化します。日付がない投稿は未予約下書きに入ります。</div>
     </div>
     <div class="modal-foot">
       <button class="btn" data-close="importDialog">キャンセル</button>
@@ -545,6 +967,10 @@
               <option>夜</option>
               <option>未定</option>
             </select>
+          </div>
+          <div class="field">
+            <label>日付</label>
+            <input name="date" type="date">
           </div>
           <div class="field full">
             <label>テーマ</label>
@@ -620,10 +1046,26 @@
       accountFilter: document.getElementById("accountFilter"),
       statusFilter: document.getElementById("statusFilter"),
       searchInput: document.getElementById("searchInput"),
-      statTotal: document.getElementById("statTotal"),
+      statMonthPosts: document.getElementById("statMonthPosts"),
       statPosted: document.getElementById("statPosted"),
       statViews: document.getElementById("statViews"),
-      statTodo: document.getElementById("statTodo"),
+      statBestViews: document.getElementById("statBestViews"),
+      statBestTheme: document.getElementById("statBestTheme"),
+      statNextMove: document.getElementById("statNextMove"),
+      missionText: document.getElementById("missionText"),
+      missionSub: document.getElementById("missionSub"),
+      winningPattern: document.getElementById("winningPattern"),
+      todayPriority: document.getElementById("todayPriority"),
+      rankBadge: document.getElementById("rankBadge"),
+      progressText: document.getElementById("progressText"),
+      progressFill: document.getElementById("progressFill"),
+      streakText: document.getElementById("streakText"),
+      bestPostText: document.getElementById("bestPostText"),
+      formatMixText: document.getElementById("formatMixText"),
+      monthSummary: document.getElementById("monthSummary"),
+      monthCalendar: document.getElementById("monthCalendar"),
+      weekSchedule: document.getElementById("weekSchedule"),
+      unscheduledDrafts: document.getElementById("unscheduledDrafts"),
       toast: document.getElementById("toast"),
       importDialog: document.getElementById("importDialog"),
       addDialog: document.getElementById("addDialog"),
@@ -707,9 +1149,10 @@
       const query = els.searchInput.value.trim().toLowerCase();
       return state.items.filter(item => {
         const text = [item.account, item.platform, item.timeSlot, item.theme, ...(item.slides || [])].join(" ").toLowerCase();
+        const dateMatch = activeDate === "all" || item.date === activeDate || (!item.date && item.status !== "posted");
         return (account === "all" || item.account === account)
           && (status === "all" || item.status === status)
-          && (activeDate === "all" || item.date === activeDate)
+          && dateMatch
           && (activeTime === "all" || item.timeSlot === activeTime)
           && (!query || text.includes(query));
       }).sort((a, b) => {
@@ -726,21 +1169,82 @@
     }
 
     function renderStats() {
-      const total = state.items.length;
-      const posted = state.items.filter(item => item.status === "posted").length;
-      const views = state.items.reduce((sum, item) => sum + (Number(item.metrics?.views) || 0), 0);
-      els.statTotal.textContent = total;
+      const monthKey = (activeDate === "all" ? todayString() : activeDate).slice(0, 7);
+      const monthItems = state.items.filter(item => String(item.date || "").startsWith(monthKey));
+      const posted = monthItems.filter(item => item.status === "posted").length;
+      const views = monthItems.reduce((sum, item) => sum + (Number(item.metrics?.views) || 0), 0);
+      const best = [...monthItems].sort((a, b) => (Number(b.metrics?.views) || 0) - (Number(a.metrics?.views) || 0))[0];
+      const bestViews = Number(best?.metrics?.views) || 0;
+      els.statMonthPosts.textContent = monthItems.length;
       els.statPosted.textContent = posted;
       els.statViews.textContent = views.toLocaleString("ja-JP");
-      els.statTodo.textContent = total - posted;
+      els.statBestViews.textContent = bestViews.toLocaleString("ja-JP");
+      els.statBestTheme.textContent = bestViews ? `${best.account}｜${best.theme || best.slides?.[0] || "投稿"}` : "まだ記録なし";
+      els.statNextMove.textContent = nextMove(monthItems, best);
+      els.missionText.textContent = `${monthItems.length}投稿 / ${views.toLocaleString("ja-JP")} imp`;
+      els.missionSub.textContent = posted ? `投稿済み${posted}件。反応が出た投稿は続編化します。` : "まずは投稿してURLと表示数を記録します。";
+      els.winningPattern.textContent = bestViews ? `${best.timeSlot || "未定"}｜${best.theme || "投稿"}` : "表示数入力待ち";
+      els.todayPriority.textContent = todayPriorityText();
+      els.monthSummary.textContent = `${monthKey} の投稿 ${monthItems.length}件、投稿済み ${posted}件、合計 ${views.toLocaleString("ja-JP")} imp`;
+      updateGameStats(monthItems, views, best, bestViews);
+    }
+
+    function updateGameStats(monthItems, views, best, bestViews) {
+      const postTarget = 100;
+      const viewTarget = 100000;
+      const postScore = Math.min(50, Math.round((monthItems.length / postTarget) * 50));
+      const viewScore = Math.min(50, Math.round((views / viewTarget) * 50));
+      const progress = Math.min(100, postScore + viewScore);
+      const rank = progress >= 80 ? "Lv.5 Momentum"
+        : progress >= 60 ? "Lv.4 Builder"
+        : progress >= 40 ? "Lv.3 Climber"
+        : progress >= 20 ? "Lv.2 Starter+"
+        : "Lv.1 Starter";
+      els.rankBadge.textContent = rank;
+      els.progressText.textContent = `${progress}%`;
+      els.progressFill.style.width = `${progress}%`;
+      els.streakText.textContent = `連続投稿 ${postingStreak()}日`;
+      els.bestPostText.textContent = bestViews ? `最高 ${bestViews.toLocaleString("ja-JP")} imp` : "最高投稿を探索中";
+      els.formatMixText.textContent = formatMixLabel(monthItems);
+    }
+
+    function postingStreak() {
+      const postedDates = new Set(
+        state.items
+          .filter(item => item.status === "posted" || Number(item.metrics?.views))
+          .map(item => item.date)
+          .filter(Boolean)
+      );
+      let cursor = new Date(todayString());
+      let streak = 0;
+      while (postedDates.has(toDateString(cursor))) {
+        streak += 1;
+        cursor.setDate(cursor.getDate() - 1);
+      }
+      return streak;
+    }
+
+    function formatMixLabel(items) {
+      const platforms = new Set(items.map(item => String(item.platform || "").toLowerCase()));
+      const hasX = [...platforms].some(platform => platform.includes("x"));
+      const hasThreads = [...platforms].some(platform => platform.includes("threads"));
+      const hasNote = [...platforms].some(platform => platform.includes("note"));
+      const count = [hasX, hasThreads, hasNote].filter(Boolean).length;
+      if (count >= 3) return "X・Threads・note運用中";
+      if (count === 2) return "2媒体ミックス中";
+      if (count === 1) return "まず1媒体を継続中";
+      return "型ミックス準備中";
     }
 
     function render() {
       syncDateControls();
       renderStats();
+      renderMonthCalendar();
+      renderWeekSchedule();
+      renderUnscheduledDrafts();
       const items = filteredItems();
       if (!items.length) {
-        els.queue.innerHTML = '<div class="empty">表示できる投稿がありません。mdから取り込むか、投稿を追加してください。</div>';
+        els.queue.innerHTML = '<div class="empty">この日に表示できる投稿がありません。Claudeのmd見出しに日付を入れるか、未予約下書きから日付を指定してください。</div>';
         return;
       }
       els.queue.innerHTML = items.map(item => cardTemplate(item)).join("");
@@ -769,6 +1273,140 @@
       render();
     }
 
+    function nextMove(monthItems, best) {
+      const drafts = monthItems.filter(item => item.status !== "posted").length;
+      const bestViews = Number(best?.metrics?.views) || 0;
+      if (!monthItems.length) return "今日の投稿案を作る";
+      if (drafts) return "下書きを投稿してログを埋める";
+      if (bestViews >= 10000) return "最高インプ投稿を続編化";
+      if (bestViews >= 1000) return "伸びたフックを別テーマへ転用";
+      return "リサーチから強いフックを追加";
+    }
+
+    function todayPriorityText() {
+      const todayItems = state.items.filter(item => item.date === todayString());
+      const draft = todayItems.find(item => item.status !== "posted");
+      if (draft) return `${draft.account} ${draft.timeSlot || "未定"}を確認`;
+      const unscheduled = state.items.find(item => !item.date && item.status !== "posted");
+      if (unscheduled) return "未予約下書きに日付を入れる";
+      if (todayItems.length) return "投稿ログを入力";
+      return "今日の投稿案を作成";
+    }
+
+    function renderMonthCalendar() {
+      const baseDate = activeDate === "all" ? todayString() : activeDate;
+      const year = Number(baseDate.slice(0, 4));
+      const month = Number(baseDate.slice(5, 7)) - 1;
+      const first = new Date(year, month, 1);
+      const start = new Date(first);
+      start.setDate(first.getDate() - first.getDay());
+      const weekdays = ["日", "月", "火", "水", "木", "金", "土"];
+      const cells = weekdays.map(day => `<div class="cal-weekday">${day}</div>`);
+      for (let i = 0; i < 42; i++) {
+        const date = new Date(start);
+        date.setDate(start.getDate() + i);
+        const dateString = toDateString(date);
+        const dayItems = state.items.filter(item => item.date === dateString);
+        const dayViews = dayItems.reduce((sum, item) => sum + (Number(item.metrics?.views) || 0), 0);
+        const isHot = dayViews >= 1000;
+        const classes = [
+          "cal-day",
+          date.getMonth() !== month ? "other-month" : "",
+          dateString === activeDate ? "active" : "",
+          dateString === todayString() ? "today" : ""
+        ].filter(Boolean).join(" ");
+        const chips = dayItems.slice(0, 3).map(item => {
+          const views = Number(item.metrics?.views) || 0;
+          const chipClass = views >= 1000 ? "hot" : item.status === "posted" ? "posted" : item.status === "scheduled" ? "scheduled" : "";
+          return `<div class="cal-chip ${chipClass}">${escapeHtml(item.timeSlot || "未定")} ${escapeHtml(shortAccount(item.account))}</div>`;
+        }).join("");
+        const more = dayItems.length > 3 ? `<div class="cal-chip">+${dayItems.length - 3}</div>` : "";
+        cells.push(`
+          <button class="${classes}" data-cal-date="${dateString}" type="button">
+            <div class="cal-top">
+              <span class="cal-num">${date.getDate()}</span>
+              <span class="cal-count">${dayItems.length ? `${dayItems.length}件` : ""}</span>
+            </div>
+            <div class="cal-times">${chips}${more}</div>
+          </button>
+        `);
+      }
+      els.monthCalendar.innerHTML = cells.join("");
+    }
+
+    function renderWeekSchedule() {
+      const base = new Date(`${activeDate === "all" ? todayString() : activeDate}T00:00:00`);
+      const start = new Date(base);
+      start.setDate(base.getDate() - base.getDay());
+      const weekdays = ["日", "月", "火", "水", "木", "金", "土"];
+      const cells = [];
+      for (let i = 0; i < 7; i++) {
+        const date = new Date(start);
+        date.setDate(start.getDate() + i);
+        const dateString = toDateString(date);
+        const dayItems = state.items
+          .filter(item => item.date === dateString)
+          .sort((a, b) => timeOrder(a.timeSlot) - timeOrder(b.timeSlot));
+        const slots = dayItems.length
+          ? dayItems.slice(0, 6).map(item => {
+            const cls = item.status === "posted" ? "posted" : item.status === "scheduled" ? "scheduled" : "";
+            return `<div class="week-slot ${cls}">${escapeHtml(item.timeSlot || "未定")} ${escapeHtml(shortAccount(item.account))}｜${escapeHtml(item.theme || item.slides?.[0] || "投稿")}</div>`;
+          }).join("")
+          : '<div class="week-slot">空き</div>';
+        const classes = [
+          "week-day",
+          dateString === activeDate ? "active" : "",
+          dateString === todayString() ? "today" : ""
+        ].filter(Boolean).join(" ");
+        cells.push(`
+          <button class="${classes}" data-week-date="${dateString}" type="button">
+            <div class="week-head">
+              <span class="week-name">${weekdays[i]}</span>
+              <span class="week-date">${date.getDate()}</span>
+            </div>
+            ${slots}
+          </button>
+        `);
+      }
+      els.weekSchedule.innerHTML = cells.join("");
+    }
+
+    function renderUnscheduledDrafts() {
+      const query = els.searchInput.value.trim().toLowerCase();
+      const account = els.accountFilter.value;
+      const drafts = state.items
+        .filter(item => !item.date && item.status !== "posted")
+        .filter(item => account === "all" || item.account === account)
+        .filter(item => {
+          const text = [item.account, item.platform, item.timeSlot, item.theme, ...(item.slides || [])].join(" ").toLowerCase();
+          return !query || text.includes(query);
+        });
+      if (!drafts.length) {
+        els.unscheduledDrafts.innerHTML = '<div class="empty" style="padding:14px 8px;">未予約の下書きはありません</div>';
+        return;
+      }
+      els.unscheduledDrafts.innerHTML = drafts.map(item => `
+        <button class="draft-card" data-draft-id="${item.id}" type="button">
+          <b>${escapeHtml(item.theme || item.slides?.[0] || "投稿")}</b>
+          <small>${escapeHtml(item.account)}｜${escapeHtml(item.platform)}｜${escapeHtml(item.timeSlot || "未定")}</small>
+        </button>
+      `).join("");
+    }
+
+    function shortAccount(account) {
+      if (account === "まり小学校受験") return "小受";
+      if (account === "まり教育AI") return "教育AI";
+      if (account === "七田式") return "七田";
+      return account || "";
+    }
+
+    function toDateString(date) {
+      const y = date.getFullYear();
+      const m = String(date.getMonth() + 1).padStart(2, "0");
+      const d = String(date.getDate()).padStart(2, "0");
+      return `${y}-${m}-${d}`;
+    }
+
     function cardTemplate(item) {
       const statusClass = item.status === "posted" ? "ok" : item.status === "scheduled" ? "warn" : "gray";
       const slides = (item.slides || ["", "", ""]).slice(0, 3);
@@ -779,6 +1417,7 @@
               <div class="meta">
                 <span class="pill">${escapeHtml(item.account)}</span>
                 <span class="pill">${escapeHtml(item.platform)}</span>
+                <span class="pill">${escapeHtml(item.date || "未予約")}</span>
                 <span class="pill">${escapeHtml(item.timeSlot || "未定")}</span>
                 <span class="pill ${statusClass}">${statusLabel(item.status)}</span>
               </div>
@@ -786,7 +1425,7 @@
             </div>
             <div class="card-tools">
               <button class="btn small" data-action="copyAll">3枚コピー</button>
-              <button class="btn small" data-action="postX">X投稿</button>
+              <button class="btn small" data-action="openXDraft">X投稿画面</button>
               <button class="btn small" data-action="openThreadsDraft">Threadsコピー</button>
               <button class="btn small" data-action="toggleStatus">${item.status === "posted" ? "未投稿へ" : "投稿済み"}</button>
               <button class="btn small danger" data-action="delete">削除</button>
@@ -804,6 +1443,18 @@
             `).join("")}
           </div>
           <div class="log-area">
+            <div class="field">
+              <label>日付</label>
+              <input data-field-root="date" type="date" value="${escapeHtml(item.date || "")}">
+            </div>
+            <div class="field">
+              <label>状態</label>
+              <select data-field-root="status">
+                <option value="draft" ${item.status === "draft" ? "selected" : ""}>下書き</option>
+                <option value="scheduled" ${item.status === "scheduled" ? "selected" : ""}>投稿予定</option>
+                <option value="posted" ${item.status === "posted" ? "selected" : ""}>投稿済み</option>
+              </select>
+            </div>
             <div class="field wide">
               <label>投稿URL</label>
               <input data-field="url" value="${escapeHtml(item.metrics?.url || "")}" placeholder="https://">
@@ -843,6 +1494,7 @@
       let currentHeading = "";
       let currentAccount = "";
       let currentTime = "未定";
+      let currentDate = guessDate(md, "");
       let codeBuffer = [];
       let inCode = false;
       let codeText = "";
@@ -853,7 +1505,7 @@
           const heading = currentHeading || slides[0].slice(0, 32);
           items.push({
             id: crypto.randomUUID(),
-            date: new Date().toISOString().slice(0, 10),
+            date: currentDate,
             account: currentAccount || guessAccount(heading),
             platform: "Threads / X",
             timeSlot: currentTime,
@@ -872,6 +1524,7 @@
           currentHeading = headingMatch[1].trim();
           currentAccount = guessAccount(currentHeading);
           currentTime = guessTime(currentHeading);
+          currentDate = guessDate(currentHeading, currentDate);
           continue;
         }
         if (line.startsWith("```")) {
@@ -905,6 +1558,18 @@
       return "未定";
     }
 
+    function guessDate(text, fallback = todayString()) {
+      const ymd = text.match(/(20\d{2})[-\/.年](\d{1,2})[-\/.月](\d{1,2})日?/);
+      if (ymd) return `${ymd[1]}-${ymd[2].padStart(2, "0")}-${ymd[3].padStart(2, "0")}`;
+      const md = text.match(/(?:^|\D)(\d{1,2})[\/月](\d{1,2})日?(?:\D|$)/);
+      if (md) {
+        const year = (activeDate === "all" ? todayString() : activeDate).slice(0, 4);
+        return `${year}-${md[1].padStart(2, "0")}-${md[2].padStart(2, "0")}`;
+      }
+      if (/未予約|日付未定|ストック/.test(text)) return "";
+      return fallback;
+    }
+
     function cleanHeading(text) {
       return text.replace(/^(まり教育AI|まり小学校受験|七田式)\s*/g, "").replace(/(朝投稿|昼投稿|夜投稿)/g, "").trim() || "投稿";
     }
@@ -925,84 +1590,6 @@
       }
       await copyText(text);
       window.location.href = "https://www.threads.com/";
-    }
-
-    function getPostSecret() {
-      let secret = localStorage.getItem("snsAutoManagerLite.postSecret") || "";
-      if (!secret) {
-        secret = prompt("X投稿用の投稿キーを入力してください。Vercelの SNS_POST_SECRET と同じ値です。") || "";
-        if (secret) localStorage.setItem("snsAutoManagerLite.postSecret", secret);
-      }
-      return secret;
-    }
-
-    async function postToX(item, card) {
-      if (location.protocol === "file:") {
-        showToast("X投稿はVercel版で使えます");
-        return;
-      }
-      if (item.account !== "まり教育AI") {
-        showToast("今は教育AIだけX投稿できます");
-        return;
-      }
-      const visibleSlides = card
-        ? Array.from(card.querySelectorAll("[data-slide-field]")).map(input => input.value)
-        : [];
-      const sourceSlides = visibleSlides.length ? visibleSlides : (item.slides || []);
-      const slides = sourceSlides.map(slide => String(slide || "").trim()).filter(Boolean);
-      if (!slides.length) {
-        showToast("本文がありません");
-        return;
-      }
-      item.slides = sourceSlides.slice(0, 3);
-      saveState();
-      const secret = getPostSecret();
-      if (!secret) {
-        showToast("投稿キーが必要です");
-        return;
-      }
-      if (!confirm(`この内容を教育AIアカウントでXに${slides.length}投稿のスレッドとして投稿しますか？`)) return;
-      try {
-        showToast("X投稿中...");
-        const response = await fetch("/api/x/post", {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-            "X-Post-Secret": secret
-          },
-          body: JSON.stringify({
-            id: item.id,
-            account: item.account,
-            slides,
-            text: slides.join("\n\n")
-          })
-        });
-        const data = await response.json();
-        if (!response.ok || !data.ok) {
-          const detail = data.detail ? JSON.stringify(data.detail).slice(0, 500) : "";
-          const statusHint = response.status ? `HTTP ${response.status}` : "";
-          throw new Error(`${statusHint} ${data.error || "X投稿に失敗しました"} ${detail}`.trim());
-        }
-        item.status = "posted";
-        item.metrics = item.metrics || {};
-        item.metrics.url = data.url || "";
-        item.metrics.memo = item.metrics.memo || `X API投稿済み（${data.ids?.length || slides.length}投稿スレッド）`;
-        saveState();
-        render();
-        await saveToSheets();
-        showToast("Xに投稿しました");
-      } catch (error) {
-        console.error(error);
-        if (/401|unauthorized/i.test(error.message || "")) {
-          localStorage.removeItem("snsAutoManagerLite.postSecret");
-        }
-        item.metrics = item.metrics || {};
-        item.metrics.memo = `X投稿失敗: ${error.message || "unknown_error"}`;
-        saveState();
-        render();
-        alert(`X投稿に失敗しました。\n\n${error.message || "原因不明のエラーです"}`);
-        showToast("X投稿に失敗しました");
-      }
     }
 
     function exportCsv() {
@@ -1036,7 +1623,7 @@
     function sheetRowToItem(row) {
       return {
         id: row.id || crypto.randomUUID(),
-        date: row.date || new Date().toISOString().slice(0, 10),
+        date: row.date || "",
         account: row.account || "まり小学校受験",
         platform: row.platform || "Threads/X",
         timeSlot: row.timeSlot || "未定",
@@ -1166,7 +1753,7 @@
       const data = new FormData(event.currentTarget);
       state.items.unshift({
         id: crypto.randomUUID(),
-        date: new Date().toISOString().slice(0, 10),
+        date: data.get("date") || "",
         account: data.get("account"),
         platform: data.get("platform"),
         timeSlot: data.get("timeSlot"),
@@ -1211,6 +1798,30 @@
       });
     });
 
+    els.monthCalendar.addEventListener("click", event => {
+      const day = event.target.closest("[data-cal-date]");
+      if (!day) return;
+      setActiveDate(day.dataset.calDate);
+    });
+
+    els.weekSchedule.addEventListener("click", event => {
+      const day = event.target.closest("[data-week-date]");
+      if (!day) return;
+      setActiveDate(day.dataset.weekDate);
+    });
+
+    els.unscheduledDrafts.addEventListener("click", event => {
+      const draft = event.target.closest("[data-draft-id]");
+      if (!draft) return;
+      const item = state.items.find(row => row.id === draft.dataset.draftId);
+      if (!item) return;
+      item.date = activeDate === "all" ? todayString() : activeDate;
+      if (item.status === "draft") item.status = "scheduled";
+      saveState();
+      render();
+      showToast(`${shortDateLabel(item.date)}に配置しました`);
+    });
+
     els.datePicker.addEventListener("input", event => {
       setActiveDate(event.target.value || todayString());
     });
@@ -1232,12 +1843,6 @@
       if (action === "copyAll") {
         copyText((item.slides || []).join("\n\n"));
       }
-      if (action === "postX") {
-        postToX(item, card);
-      }
-      if (action === "openThreadsDraft") {
-        openDraft(item, "threads");
-      }
       if (action === "toggleStatus") {
         item.status = item.status === "posted" ? "draft" : "posted";
         saveState();
@@ -1252,6 +1857,16 @@
     });
 
     els.queue.addEventListener("input", event => {
+      const rootInput = event.target.closest("[data-field-root]");
+      if (rootInput) {
+        const card = event.target.closest(".card");
+        const item = findItem(card);
+        if (!item) return;
+        item[rootInput.dataset.fieldRoot] = rootInput.value;
+        saveState();
+        render();
+        return;
+      }
       const input = event.target.closest("[data-field]");
       if (!input) return;
       const card = event.target.closest(".card");
@@ -1274,6 +1889,17 @@
       item.slides[index] = input.value;
       if (index === 0 && !item.theme) item.theme = input.value.slice(0, 40);
       saveState();
+    });
+
+    els.queue.addEventListener("change", event => {
+      const rootInput = event.target.closest("[data-field-root]");
+      if (!rootInput) return;
+      const card = event.target.closest(".card");
+      const item = findItem(card);
+      if (!item) return;
+      item[rootInput.dataset.fieldRoot] = rootInput.value;
+      saveState();
+      render();
     });
 
     document.getElementById("copyToday").addEventListener("click", () => {
