@@ -1010,7 +1010,8 @@
           <div class="field">
             <label for="statusFilter">状態</label>
             <select id="statusFilter">
-              <option value="all">すべて</option>
+              <option value="active">未投稿すべて</option>
+              <option value="all">全ステータス</option>
               <option value="draft">下書き</option>
               <option value="scheduled">投稿予定</option>
               <option value="posted">投稿済み</option>
@@ -1434,8 +1435,11 @@
       return state.items.filter(item => {
         const text = [item.account, item.platform, item.timeSlot, item.theme, ...(item.slides || [])].join(" ").toLowerCase();
         const dateMatch = activeDate === "all" || item.date === activeDate || (!item.date && item.status !== "posted");
+        const statusMatch = status === "all"
+          || (status === "active" && item.status !== "posted")
+          || item.status === status;
         return (account === "all" || item.account === account)
-          && (status === "all" || item.status === status)
+          && statusMatch
           && dateMatch
           && (activeTime === "all" || item.timeSlot === activeTime)
           && (!query || text.includes(query));
@@ -2282,6 +2286,12 @@
       if (action === "copyAll") {
         copyText((item.slides || []).join("\n\n"));
       }
+      if (action === "openXDraft") {
+        openDraft(item, "x");
+      }
+      if (action === "openThreadsDraft") {
+        openDraft(item, "threads");
+      }
       if (action === "toggleStatus") {
         item.status = item.status === "posted" ? "draft" : "posted";
         saveState();
@@ -2296,16 +2306,6 @@
     });
 
     els.queue.addEventListener("input", event => {
-      const rootInput = event.target.closest("[data-field-root]");
-      if (rootInput) {
-        const card = event.target.closest(".card");
-        const item = findItem(card);
-        if (!item) return;
-        item[rootInput.dataset.fieldRoot] = rootInput.value;
-        saveState();
-        render();
-        return;
-      }
       const input = event.target.closest("[data-field]");
       if (!input) return;
       const card = event.target.closest(".card");
@@ -2338,8 +2338,12 @@
       const item = findItem(card);
       if (!item) return;
       item[rootInput.dataset.fieldRoot] = rootInput.value;
+      if (rootInput.dataset.fieldRoot === "date" && rootInput.value) {
+        activeDate = rootInput.value;
+      }
       saveState();
       render();
+      showToast(rootInput.dataset.fieldRoot === "date" ? "日付を保存しました" : "状態を保存しました");
     });
 
     document.getElementById("copyToday").addEventListener("click", () => {
